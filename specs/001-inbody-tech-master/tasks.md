@@ -79,26 +79,26 @@
 
 ### LangGraph 기본 골격
 
-- [ ] T029 [US1] src/graph/workflow.py에 StateGraph 기본 골격 구현 (AgentState 기반, START → ModelRouter → IntentRouter 기본 엣지)
-- [ ] T030 [US1] src/graph/edges.py에 ModelRouter 이후 조건부 엣지 구현 (기종 식별 성공 → IntentRouter, 미식별 → 확인 질문, 미지원 → 안내)
+- [x] T029 [US1] src/graph/workflow.py에 StateGraph 기본 골격 구현 (AgentState 기반, START → ModelRouter → IntentRouter 기본 엣지)
+- [x] T030 [US1] src/graph/edges.py에 ModelRouter 이후 조건부 엣지 구현 (기종 식별 성공 → IntentRouter, 미식별 → 확인 질문, 미지원 → 안내)
 
 ### ModelRouter 구현
 
-- [ ] T031 [US1] src/graph/nodes/model_router.py에 텍스트 기반 기종 식별 노드 구현 (LLM 호출로 270S/580/770S/970S 분류, model_tier 및 tone_profile 자동 설정)
+- [x] T031 [US1] src/graph/nodes/model_router.py에 텍스트 기반 기종 식별 노드 구현 (LLM 호출로 270S/580/770S/970S 분류, model_tier 및 tone_profile 자동 설정)
 - [REMOVED] T032 [US1] ~~이미지 기반 기종 식별~~ — 데모 단순화를 위해 제거
-- [ ] T033 [US1] src/graph/nodes/model_router.py에 기종 미식별 시 확인 질문 생성 로직 구현 (4개 기종 선택지 제시)
-- [ ] T034 [US1] src/graph/nodes/model_router.py에 미지원 기종 안내 로직 구현 (지원 불가 메시지 + InBody 고객센터 연락처)
+- [x] T033 [US1] src/graph/nodes/model_router.py에 기종 미식별 시 확인 질문 생성 로직 구현 (4개 기종 선택지 제시)
+- [x] T034 [US1] src/graph/nodes/model_router.py에 미지원 기종 안내 로직 구현 (지원 불가 메시지 + InBody 고객센터 연락처)
 
 ### IntentRouter 구현
 
-- [ ] T035 [US1] src/graph/nodes/intent_router.py에 의도 분류 노드 구현 (LLM 호출로 install/connect/troubleshoot/clinical/general 분류)
-- [ ] T036 [US1] src/graph/edges.py에 IntentRouter 이후 조건부 엣지 추가 (intent별 → 각 전문 에이전트 노드로 분기)
+- [x] T035 [US1] src/graph/nodes/intent_router.py에 의도 분류 노드 구현 (LLM 호출로 install/connect/troubleshoot/clinical/general 분류)
+- [x] T036 [US1] src/graph/edges.py에 IntentRouter 이후 조건부 엣지 추가 (intent별 → 각 전문 에이전트 노드로 분기)
 
 ### 기본 API 연동
 
-- [ ] T037 [US1] src/main.py에 FastAPI 앱 초기화 (CORS, 라우터 등록, 라이프사이클 이벤트로 DB/VectorStore 초기화)
-- [ ] T038 [US1] src/api/chat.py에 POST /api/v1/chat 엔드포인트 구현 (요청 파싱 → LangGraph workflow invoke → 응답 포매팅)
-- [ ] T039 [US1] src/api/health.py에 GET /api/v1/health 엔드포인트 구현 (LLM, Vector DB, Structured DB 상태 확인)
+- [x] T037 [US1] src/main.py에 FastAPI 앱 초기화 (CORS, 라우터 등록, 라이프사이클 이벤트로 DB/VectorStore 초기화)
+- [x] T038 [US1] src/api/chat.py에 POST /api/v1/chat 엔드포인트 구현 (요청 파싱 → LangGraph workflow invoke → 응답 포매팅)
+- [x] T039 [US1] src/api/health.py에 GET /api/v1/health 엔드포인트 구현 (LLM, Vector DB, Structured DB 상태 확인)
 
 **Checkpoint**: 기종 식별 + 의도 분류 + 기본 API가 동작하는 MVP 상태
 
