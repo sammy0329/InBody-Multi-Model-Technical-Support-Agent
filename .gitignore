@@ -36,3 +36,6 @@ htmlcov/
 
 # mypy
 .mypy_cache/
+
+# 블로그 초안 (Velog 게시 전 로컬 작성용)
+docs/blog/
