@@ -1,0 +1,38 @@
+# 환경 변수
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# 가상환경
+.venv/
+venv/
+
+# 데이터 (로컬 생성)
+data/chroma/
+data/inbody.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 테스트/커버리지
+htmlcov/
+.coverage
+.pytest_cache/
+
+# mypy
+.mypy_cache/
