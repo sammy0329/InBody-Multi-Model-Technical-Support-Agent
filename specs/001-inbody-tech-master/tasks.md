@@ -127,9 +127,9 @@
 
 **Independent Test**: "설치 방법" 문의 시 해당 기종의 조립 유형에 맞는 가이드 정확 제시 확인
 
-- [ ] T046 [US3] src/graph/nodes/install_agent.py에 설치 도우미 에이전트 노드 구현 (기종의 installation_type 확인 → search_manual Tool로 설치 매뉴얼 RAG 검색 → 단계별 가이드 생성)
-- [ ] T047 [US3] src/graph/nodes/install_agent.py에 설치 중 문제 대응 로직 추가 (특정 단계 막힘 시 해당 단계 체크리스트 제시)
-- [ ] T048 [US3] src/graph/workflow.py에 InstallAgent 노드 및 엣지 등록
+- [x] T046 [US3] src/graph/nodes/install_agent.py에 설치 도우미 에이전트 노드 구현 (기종의 installation_type 확인 → search_manual Tool로 설치 매뉴얼 RAG 검색 → 단계별 가이드 생성)
+- [x] T047 [US3] src/graph/nodes/install_agent.py에 설치 중 문제 대응 로직 추가 (특정 단계 막힘 시 해당 단계 체크리스트 제시)
+- [x] T048 [US3] src/graph/workflow.py에 InstallAgent 노드 및 엣지 등록
 
 **Checkpoint**: 설치 도우미 흐름이 독립적으로 동작하는 상태
 
