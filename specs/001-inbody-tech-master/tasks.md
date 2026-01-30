@@ -173,17 +173,17 @@
 
 **Purpose**: 안전 검증 노드 구현 및 전체 워크플로우 통합
 
-- [ ] T056 src/graph/nodes/guardrail.py에 가드레일 노드 구현:
+- [x] T056 src/graph/nodes/guardrail.py에 가드레일 노드 구현:
   - 면책 문구 검증 (needs_disclaimer=True인데 answer에 면책 문구 미포함 시 자동 삽입)
   - 기종 격리 검증 (retrieved_docs의 model 메타데이터와 identified_model 불일치 시 해당 청크 제거)
   - Level 구분 검증 (support_level=Level3인데 사용자 직접 수리 안내가 포함된 경우 차단)
   - 톤앤매너 일관성 확인
-- [ ] T057 src/graph/workflow.py에 Guardrail 노드를 모든 에이전트 출력 후에 연결 (Agent → Guardrail → END)
-- [ ] T058 src/graph/workflow.py에 Guardrail 미통과 시 응답 수정 → 재검증 루프 구현
-- [ ] T059 src/api/chat.py에 POST /api/v1/chat/stream SSE 스트리밍 엔드포인트 구현 (astream_events 활용)
-- [ ] T060 src/api/models_api.py에 GET /api/v1/models 및 GET /api/v1/models/{model_id} 엔드포인트 구현
-- [ ] T061 src/api/sessions.py에 GET /api/v1/sessions/{thread_id} 및 DELETE /api/v1/sessions/{thread_id} 엔드포인트 구현
-- [ ] T062 src/graph/workflow.py에 InMemorySaver 체크포인터 연결 (세션 간 기종 식별 정보 유지)
+- [x] T057 src/graph/workflow.py에 Guardrail 노드를 모든 에이전트 출력 후에 연결 (Agent → Guardrail → END)
+- [x] T058 src/graph/workflow.py에 Guardrail 미통과 시 응답 수정 → 재검증 루프 구현
+- [x] T059 src/api/chat.py에 POST /api/v1/chat/stream SSE 스트리밍 엔드포인트 구현 (astream_events 활용)
+- [x] T060 src/api/models_api.py에 GET /api/v1/models 및 GET /api/v1/models/{model_id} 엔드포인트 구현
+- [x] T061 src/api/sessions.py에 GET /api/v1/sessions/{thread_id} 및 DELETE /api/v1/sessions/{thread_id} 엔드포인트 구현
+- [x] T062 src/graph/workflow.py에 InMemorySaver 체크포인터 연결 (세션 간 기종 식별 정보 유지)
 
 **Checkpoint**: 모든 에이전트 + 가드레일 + API가 통합된 완전한 시스템
 

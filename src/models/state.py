@@ -1,8 +1,9 @@
 """LangGraph 에이전트 상태 정의"""
 
-from typing import TypedDict
+from typing import Annotated, TypedDict
 
 from langchain_core.messages import BaseMessage
+from langgraph.graph import add_messages
 
 
 class AgentState(TypedDict):
@@ -12,8 +13,8 @@ class AgentState(TypedDict):
     기종 식별 → 의도 분류 → 전문 에이전트 → 가드레일 흐름에서 사용된다.
     """
 
-    # 대화 이력
-    messages: list[BaseMessage]
+    # 대화 이력 (add_messages 리듀서: 체크포인터에서 대화 이력 누적)
+    messages: Annotated[list[BaseMessage], add_messages]
 
     # 기종 식별 결과
     identified_model: str | None  # "270S" | "580" | "770S" | "970S" | None
@@ -37,3 +38,6 @@ class AgentState(TypedDict):
     needs_disclaimer: bool
     answer: str | None
     guardrail_passed: bool | None
+    guardrail_retry_count: int
+    guardrail_violations: list[str]
+    guardrail_suggestion: str | None
