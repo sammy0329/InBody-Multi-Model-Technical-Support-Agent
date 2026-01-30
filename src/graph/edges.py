@@ -1,4 +1,4 @@
-"""조건부 엣지 라우팅 함수 — T030, T036, T055, T057"""
+"""조건부 엣지 라우팅 함수 — T030, T036, T055, T057, T064"""
 
 from src.models.state import AgentState
 
@@ -6,9 +6,12 @@ from src.models.state import AgentState
 def route_after_model_router(state: AgentState) -> str:
     """ModelRouter 결과에 따라 다음 노드를 결정한다.
 
+    - answer가 설정됨 (비교/unsupported/unidentified) → END (T064)
     - identified_model이 설정됨 → intent_router로 진행
-    - answer가 설정됨 (unidentified/unsupported) → END
+    - 그 외 → END
     """
+    if state.get("answer"):
+        return "__end__"
     if state.get("identified_model"):
         return "intent_router"
     return "__end__"

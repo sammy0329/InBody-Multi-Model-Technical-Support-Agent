@@ -17,11 +17,11 @@ git clone <repository-url>
 cd InBody-Multi-Model-Technical-Support-Agent
 
 # 가상환경 생성 및 활성화
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 
 # 의존성 설치
-pip install -r requirements.txt
+pip install -e ".[dev]"
 ```
 
 ## 2. 환경 변수 설정
