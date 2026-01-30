@@ -110,12 +110,12 @@
 
 **Independent Test**: 에러 코드 입력 시 해당 기종 전용 해결 가이드 제시, Level 3 에러에 서비스 센터 이관 안내 확인
 
-- [ ] T040 [US2] src/graph/nodes/troubleshoot_agent.py에 트러블슈팅 에이전트 노드 구현 (에러 코드 추출 → lookup_error_code Tool 호출 → 해결책 생성)
-- [ ] T041 [US2] src/graph/nodes/troubleshoot_agent.py에 증상 기반 진단 로직 추가 (에러 코드 없이 증상만 입력 시 search_errors_by_symptom 호출 + 매뉴얼 RAG 검색)
-- [ ] T042 [US2] src/graph/nodes/troubleshoot_agent.py에 Level 1/Level 3 분기 응답 생성 로직 구현 (Level 1: 단계별 해결, Level 3: 서비스 센터 이관 + 경고)
-- [ ] T043 [US2] src/graph/nodes/troubleshoot_agent.py에 에스컬레이션 로직 추가 (Level 1 해결 실패 시 → 다음 단계 또는 Level 3 이관)
-- [ ] T044 [US2] src/api/errors.py에 GET /api/v1/models/{model_id}/errors 및 GET /api/v1/models/{model_id}/errors/{error_code} 엔드포인트 구현
-- [ ] T045 [US2] src/graph/workflow.py에 TroubleshootAgent 노드 및 엣지 등록
+- [x] T040 [US2] src/graph/nodes/troubleshoot_agent.py에 트러블슈팅 에이전트 노드 구현 (에러 코드 추출 → lookup_error_code Tool 호출 → 해결책 생성)
+- [x] T041 [US2] src/graph/nodes/troubleshoot_agent.py에 증상 기반 진단 로직 추가 (에러 코드 없이 증상만 입력 시 search_errors_by_symptom 호출 + 매뉴얼 RAG 검색)
+- [x] T042 [US2] src/graph/nodes/troubleshoot_agent.py에 Level 1/Level 3 분기 응답 생성 로직 구현 (Level 1: 단계별 해결, Level 3: 서비스 센터 이관 + 경고)
+- [x] T043 [US2] src/graph/nodes/troubleshoot_agent.py에 에스컬레이션 로직 추가 (Level 1 해결 실패 시 → 다음 단계 또는 Level 3 이관)
+- [x] T044 [US2] src/api/errors.py에 GET /api/v1/models/{model_id}/errors 및 GET /api/v1/models/{model_id}/errors/{error_code} 엔드포인트 구현
+- [x] T045 [US2] src/graph/workflow.py에 TroubleshootAgent 노드 및 엣지 등록
 
 **Checkpoint**: 트러블슈팅 흐름이 독립적으로 동작하는 상태
 

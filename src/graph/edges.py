@@ -17,7 +17,10 @@ def route_after_model_router(state: AgentState) -> str:
 def route_after_intent_router(state: AgentState) -> str:
     """IntentRouter 결과에 따라 다음 노드를 결정한다.
 
-    Phase 3: 모든 의도 → placeholder_agent
-    Phase 4~7: intent별 전문 에이전트로 분기 예정
+    - troubleshoot → troubleshoot_agent (Phase 4)
+    - 그 외 → placeholder_agent (Phase 5~7에서 전문 에이전트로 대체 예정)
     """
+    intent = state.get("intent", "general")
+    if intent == "troubleshoot":
+        return "troubleshoot_agent"
     return "placeholder_agent"
