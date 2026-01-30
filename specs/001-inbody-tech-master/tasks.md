@@ -32,40 +32,40 @@
 
 ### 데이터 모델 정의
 
-- [ ] T007 src/models/state.py에 AgentState TypedDict 정의 (messages, identified_model, model_tier, intent, retrieved_docs, error_code, support_level, tone_profile, needs_disclaimer, answer, guardrail_passed)
-- [ ] T008 [P] src/models/inbody_models.py에 InBodyModel 기종 프로필 상수 정의 (270S/580: entry+foldable+casual, 770S/970S: professional+separable+professional)
-- [ ] T009 [P] src/models/error_codes.py에 ErrorCode Pydantic 모델 및 SQLAlchemy 스키마 정의 (code, model_id, title, description, cause, support_level, resolution_steps, escalation_note)
-- [ ] T010 [P] src/models/peripherals.py에 PeripheralCompatibility Pydantic 모델 및 SQLAlchemy 스키마 정의 (model_id, peripheral_type, peripheral_name, is_compatible, connection_method, setup_steps)
+- [x] T007 src/models/state.py에 AgentState TypedDict 정의 (messages, identified_model, model_tier, intent, retrieved_docs, error_code, support_level, tone_profile, needs_disclaimer, answer, guardrail_passed)
+- [x] T008 [P] src/models/inbody_models.py에 InBodyModel 기종 프로필 상수 정의 (270S/580: entry+foldable+casual, 770S/970S: professional+separable+professional)
+- [x] T009 [P] src/models/error_codes.py에 ErrorCode Pydantic 모델 및 SQLAlchemy 스키마 정의 (code, model_id, title, description, cause, support_level, resolution_steps, escalation_note)
+- [x] T010 [P] src/models/peripherals.py에 PeripheralCompatibility Pydantic 모델 및 SQLAlchemy 스키마 정의 (model_id, peripheral_type, peripheral_name, is_compatible, connection_method, setup_steps)
 
 ### 구조화된 DB 설정
 
-- [ ] T011 src/db/database.py에 SQLAlchemy 엔진 및 세션 팩토리 구현 (SQLite 개발용, 비동기 지원)
-- [ ] T012 src/db/schemas.py에 ErrorCode와 PeripheralCompatibility 테이블 정의 (SQLAlchemy ORM)
-- [ ] T013 data/seed/error_codes.json에 기종별 샘플 에러 코드 데이터 작성 (기종당 최소 5건, Level1/Level3 혼합)
-- [ ] T014 [P] data/seed/peripheral_compatibility.json에 기종별 샘플 호환표 데이터 작성 (기종당 프린터/PC/바코드 리더기 최소 3건)
-- [ ] T015 src/db/seed.py에 JSON 시드 데이터를 DB에 로드하는 스크립트 구현
-- [ ] T016 scripts/seed_structured_data.py에 시드 실행 진입점 구현 (src/db/seed.py 호출)
+- [x] T011 src/db/database.py에 SQLAlchemy 엔진 및 세션 팩토리 구현 (SQLite 개발용, 비동기 지원)
+- [x] T012 src/db/schemas.py에 ErrorCode와 PeripheralCompatibility 테이블 정의 (SQLAlchemy ORM)
+- [x] T013 data/seed/error_codes.json에 기종별 샘플 에러 코드 데이터 작성 (기종당 최소 5건, Level1/Level3 혼합)
+- [x] T014 [P] data/seed/peripheral_compatibility.json에 기종별 샘플 호환표 데이터 작성 (기종당 프린터/PC/바코드 리더기 최소 3건)
+- [x] T015 src/db/seed.py에 JSON 시드 데이터를 DB에 로드하는 스크립트 구현
+- [x] T016 scripts/seed_structured_data.py에 시드 실행 진입점 구현 (src/db/seed.py 호출)
 
 ### RAG 파이프라인 구축
 
-- [ ] T017 src/rag/metadata.py에 메타데이터 태깅 유틸리티 구현 (model, category, section_hierarchy, support_level, error_codes 필드 추출)
-- [ ] T018 src/rag/ingest.py에 PDF 로더 및 청킹 로직 구현 (RecursiveCharacterTextSplitter, 512토큰, 20% 오버랩, 기종별 메타데이터 필수 태깅)
-- [ ] T019 src/rag/vectorstore.py에 Chroma 벡터 DB 초기화 및 기종별 컬렉션 생성 로직 구현 (inbody_270s, inbody_580, inbody_770s, inbody_970s 4개 컬렉션)
-- [ ] T020 src/rag/vectorstore.py에 기종별 리트리버 팩토리 함수 구현 (model 메타데이터 필터 필수 적용, category 필터 선택 적용)
-- [ ] T021 scripts/ingest_manuals.py에 PDF 인제스트 실행 스크립트 구현 (data/manuals/{기종}/ 디렉토리 순회, 기종별 컬렉션에 저장)
+- [x] T017 src/rag/metadata.py에 메타데이터 태깅 유틸리티 구현 (model, category, section_hierarchy, support_level, error_codes 필드 추출)
+- [x] T018 src/rag/ingest.py에 PDF 로더 및 청킹 로직 구현 (RecursiveCharacterTextSplitter, 512토큰, 20% 오버랩, 기종별 메타데이터 필수 태깅)
+- [x] T019 src/rag/vectorstore.py에 Chroma 벡터 DB 초기화 및 기종별 컬렉션 생성 로직 구현 (inbody_270s, inbody_580, inbody_770s, inbody_970s 4개 컬렉션)
+- [x] T020 src/rag/vectorstore.py에 기종별 리트리버 팩토리 함수 구현 (model 메타데이터 필터 필수 적용, category 필터 선택 적용)
+- [x] T021 scripts/ingest_manuals.py에 PDF 인제스트 실행 스크립트 구현 (data/manuals/{기종}/ 디렉토리 순회, 기종별 컬렉션에 저장)
 
 ### 프롬프트 및 톤앤매너
 
-- [ ] T022 src/prompts/disclaimers.py에 의학적 면책 문구 상수 정의 ("이 정보는 의학적 진단이 아니며, 전문 의료인의 상담을 대체하지 않습니다.")
-- [ ] T023 [P] src/prompts/tone_profiles.py에 톤앤매너 프로파일 정의 (casual: 보급형 톤 지시, professional: 전문가용 톤 지시)
-- [ ] T024 [P] src/prompts/system_prompts.py에 에이전트별 시스템 프롬프트 템플릿 정의 (model_router, intent_router, install, connect, troubleshoot, clinical, guardrail)
+- [x] T022 src/prompts/disclaimers.py에 의학적 면책 문구 상수 정의 ("이 정보는 의학적 진단이 아니며, 전문 의료인의 상담을 대체하지 않습니다.")
+- [x] T023 [P] src/prompts/tone_profiles.py에 톤앤매너 프로파일 정의 (casual: 보급형 톤 지시, professional: 전문가용 톤 지시)
+- [x] T024 [P] src/prompts/system_prompts.py에 에이전트별 시스템 프롬프트 템플릿 정의 (model_router, intent_router, install, connect, troubleshoot, clinical, guardrail)
 
 ### Tool Calling 함수
 
-- [ ] T025 src/tools/error_code_tool.py에 lookup_error_code Tool 구현 (model, error_code 파라미터 → DB 조회 → ErrorCode 반환)
-- [ ] T026 [P] src/tools/error_code_tool.py에 search_errors_by_symptom Tool 구현 (model, symptom_description → 유사 에러 검색)
-- [ ] T027 [P] src/tools/peripheral_tool.py에 check_peripheral_compatibility Tool 구현 (model, peripheral_type, peripheral_name → 호환 정보 반환)
-- [ ] T028 src/tools/manual_search_tool.py에 search_manual Tool 구현 (model, category, query → 기종별 벡터 검색, 메타데이터 필터 필수)
+- [x] T025 src/tools/error_code_tool.py에 lookup_error_code Tool 구현 (model, error_code 파라미터 → DB 조회 → ErrorCode 반환)
+- [x] T026 [P] src/tools/error_code_tool.py에 search_errors_by_symptom Tool 구현 (model, symptom_description → 유사 에러 검색)
+- [x] T027 [P] src/tools/peripheral_tool.py에 check_peripheral_compatibility Tool 구현 (model, peripheral_type, peripheral_name → 호환 정보 반환)
+- [x] T028 src/tools/manual_search_tool.py에 search_manual Tool 구현 (model, category, query → 기종별 벡터 검색, 메타데이터 필터 필수)
 
 **Checkpoint**: 데이터 파이프라인 준비 완료 — User Story 구현 시작 가능
 
@@ -73,7 +73,7 @@
 
 ## Phase 3: User Story 1 — 기종 식별 및 라우팅 (Priority: P1) 🎯 MVP
 
-**Goal**: 사용자 입력(텍스트/이미지)에서 InBody 기종을 식별하고, 해당 기종 전용 모드로 분기
+**Goal**: 사용자 입력(텍스트/선택)에서 InBody 기종을 식별하고, 해당 기종 전용 모드로 분기
 
 **Independent Test**: 기종명 입력 시 올바른 기종 식별 + 톤앤매너 적용 확인, 미지원 기종 시 안내 메시지 확인
 
@@ -85,8 +85,8 @@
 ### ModelRouter 구현
 
 - [ ] T031 [US1] src/graph/nodes/model_router.py에 텍스트 기반 기종 식별 노드 구현 (LLM 호출로 270S/580/770S/970S 분류, model_tier 및 tone_profile 자동 설정)
-- [ ] T032 [US1] src/graph/nodes/model_router.py에 이미지 기반 기종 식별 로직 추가 (GPT-4o Vision 활용, image_url이 있을 경우)
-- [ ] T033 [US1] src/graph/nodes/model_router.py에 기종 미식별 시 확인 질문 생성 로직 구현 (4개 기종 선택지 제시 또는 사진 업로드 안내)
+- [REMOVED] T032 [US1] ~~이미지 기반 기종 식별~~ — 데모 단순화를 위해 제거
+- [ ] T033 [US1] src/graph/nodes/model_router.py에 기종 미식별 시 확인 질문 생성 로직 구현 (4개 기종 선택지 제시)
 - [ ] T034 [US1] src/graph/nodes/model_router.py에 미지원 기종 안내 로직 구현 (지원 불가 메시지 + InBody 고객센터 연락처)
 
 ### IntentRouter 구현
@@ -203,12 +203,20 @@
 **Independent Test**: 브라우저에서 Streamlit UI 접속 → 기종 선택 → 질문 입력 → 스트리밍 응답 확인
 
 - [ ] T068 [US6] ui/api_client.py에 FastAPI 백엔드 HTTP 클라이언트 구현 (POST /chat, POST /chat/stream SSE 수신, GET /health, GET /models)
-- [ ] T069 [US6] ui/components.py에 사이드바 컴포넌트 구현 (기종 선택 selectbox, 이미지 업로드 file_uploader, 세션 초기화 버튼, 시스템 상태 표시)
+- [ ] T069 [US6] ui/components.py에 사이드바 컴포넌트 구현 (기종 선택 selectbox, 세션 초기화 버튼, 시스템 상태 표시)
 - [ ] T070 [US6] ui/app.py에 Streamlit 메인 채팅 앱 구현 (st.chat_message로 대화 이력 표시, st.chat_input으로 메시지 입력, st.session_state로 thread_id 관리)
 - [ ] T071 [US6] ui/app.py에 SSE 스트리밍 응답 연동 구현 (api_client의 stream 함수 → st.write_stream으로 실시간 표시)
-- [ ] T072 [US6] ui/app.py에 이미지 업로드 기종 식별 연동 구현 (file_uploader → base64 인코딩 → /chat API 전송 → 식별 결과 사이드바 반영)
+- [REMOVED] T072 [US6] ~~이미지 업로드 기종 식별 연동~~ — 데모 단순화를 위해 제거
 
-**Checkpoint**: Streamlit UI에서 전체 채팅 흐름이 동작하는 상태
+### 관리자 PDF 문서 관리 페이지
+
+- [ ] T072A [US6] ui/admin.py에 관리자 전용 PDF 관리 페이지 구현 (기종 선택 → 카테고리별 PDF 업로드 UI)
+- [ ] T072B [US6] ui/admin.py에 기종별 3종 카테고리 업로드 슬롯 구현 (매뉴얼: 필수, 프린터 호환리스트: 선택, 측정시 주의사항: 선택/공통)
+- [ ] T072C [US6] src/api/documents.py에 POST /api/v1/documents/upload 엔드포인트 구현 (PDF 수신 → 저장 → 인제스트 트리거)
+- [ ] T072D [US6] src/rag/ingest.py에 업로드된 PDF 실시간 인제스트 함수 추가 (카테고리 메타데이터 태깅 포함)
+- [ ] T072E [US6] ui/admin.py에 기종별 업로드 현황 표시 (각 카테고리별 업로드 상태, 문서명, 인제스트 완료 여부)
+
+**Checkpoint**: Streamlit UI에서 전체 채팅 흐름이 동작하고, 관리자 페이지에서 PDF 업로드/관리가 가능한 상태
 
 ---
 

@@ -15,8 +15,7 @@
 ```
 {
   "message": string (필수) — 사용자 입력 텍스트,
-  "thread_id": string (필수) — 대화 세션 식별자,
-  "image_url": string (선택) — 기기 사진 URL (기종 식별용)
+  "thread_id": string (필수) — 대화 세션 식별자
 }
 ```
 
@@ -243,6 +242,70 @@ data: {"type": "done", "disclaimer_included": true}
   }
 }
 ```
+
+## 7. 문서 관리 엔드포인트 (관리자 전용)
+
+### POST /api/v1/documents/upload
+
+기종별 PDF 문서를 업로드하고 벡터 DB에 인제스트한다.
+
+**요청 (multipart/form-data)**:
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `model_id` | string | O | 기종 식별자 (270S, 580, 770S, 970S) 또는 "common" (공통 문서) |
+| `category` | string | O | 문서 카테고리 (manual, printer_compatibility, measurement_precautions) |
+| `file` | file | O | PDF 파일 |
+
+**응답 (200)**:
+
+```
+{
+  "model_id": string,
+  "category": string,
+  "filename": string,
+  "chunk_count": number — 생성된 청크 수,
+  "status": "ingested"
+}
+```
+
+**오류 응답**:
+
+| 코드 | 조건 | 본문 |
+|------|------|------|
+| 400 | 지원하지 않는 기종 또는 카테고리 | `{"error": "지원하지 않는 기종/카테고리입니다"}` |
+| 400 | PDF가 아닌 파일 업로드 | `{"error": "PDF 파일만 업로드 가능합니다"}` |
+| 500 | 인제스트 실패 | `{"error": "문서 인제스트 중 오류가 발생했습니다"}` |
+
+**카테고리 규칙**:
+- `manual`: 기종당 필수 (기종별 사용 매뉴얼)
+- `printer_compatibility`: 선택 (기종별 프린터 호환리스트)
+- `measurement_precautions`: 선택 (전 기종 공통 — `model_id`를 "common"으로 설정하면 모든 기종 검색에서 참조)
+
+### GET /api/v1/documents
+
+업로드된 문서 현황을 조회한다.
+
+**쿼리 파라미터**:
+- `model_id` (선택): 기종별 필터
+
+**응답 (200)**:
+
+```
+{
+  "documents": [
+    {
+      "model_id": string,
+      "category": string,
+      "filename": string,
+      "chunk_count": number,
+      "uploaded_at": string (ISO 8601)
+    }
+  ]
+}
+```
+
+---
 
 ## Tool Calling 계약 (LangGraph 내부)
 
