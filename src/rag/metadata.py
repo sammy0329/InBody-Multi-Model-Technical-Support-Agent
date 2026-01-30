@@ -10,6 +10,8 @@ def create_metadata(
     section_hierarchy: str = "",
     source_file: str = "",
     page_number: int = 0,
+    content_type: str = "text",
+    image_url: str = "",
 ) -> dict:
     """RAG 문서용 메타데이터 딕셔너리 생성
 
@@ -19,19 +21,26 @@ def create_metadata(
         section_hierarchy: 문서 내 섹션 경로
         source_file: 원본 파일명
         page_number: 원본 페이지 번호
+        content_type: 청크 유형 ("text" 또는 "image")
+        image_url: 이미지 청크인 경우 정적 파일 경로
     """
     if model not in VALID_MODELS:
         raise ValueError(f"지원하지 않는 기종: {model}. 지원 기종: {VALID_MODELS}")
     if category not in VALID_CATEGORIES:
         raise ValueError(f"지원하지 않는 카테고리: {category}. 지원: {VALID_CATEGORIES}")
 
-    return {
+    metadata = {
         "model": model,
         "category": category,
         "section_hierarchy": section_hierarchy,
         "source_file": source_file,
         "page_number": page_number,
+        "content_type": content_type,
     }
+    if image_url:
+        metadata["image_url"] = image_url
+
+    return metadata
 
 
 def build_model_filter(model: str) -> dict:

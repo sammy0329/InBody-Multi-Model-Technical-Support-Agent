@@ -50,8 +50,13 @@
 
 - [x] T017 src/rag/metadata.py에 메타데이터 태깅 유틸리티 구현 (model, category, section_hierarchy, support_level, error_codes 필드 추출)
 - [x] T018 src/rag/ingest.py에 PDF 로더 및 청킹 로직 구현 (RecursiveCharacterTextSplitter, 512토큰, 20% 오버랩, 기종별 메타데이터 필수 태깅)
+- [x] T018B src/rag/metadata.py에 이미지 메타데이터 필드 추가 (image_url, content_type 파라미터)
+- [x] T018C src/tools/manual_search_tool.py 검색 결과 포맷에 image_url 포함 + extract_image_urls() 헬퍼
+- [x] T018D src/api/chat.py의 ChatResponse에 image_urls 필드 추가, state/agents에서 image_urls 전달
+- [x] T018E src/main.py에 FastAPI StaticFiles 마운트 추가
+- [DEFERRED] T018A 이미지 청크 등록 — 자동 추출(PyMuPDF) 방식은 품질 부족으로 제거. 수동 캡처 방식으로 전환 예정 (핵심 매뉴얼 이미지 3~5장을 스크린샷 → static/images/{model}/ 저장 → 등록 스크립트로 Chroma에 이미지 청크 추가). 텍스트 기능 완성 후 진행
 - [x] T019 src/rag/vectorstore.py에 Chroma 벡터 DB 초기화 및 기종별 컬렉션 생성 로직 구현 (inbody_270s, inbody_580, inbody_770s, inbody_970s 4개 컬렉션)
-- [x] T020 src/rag/vectorstore.py에 기종별 리트리버 팩토리 함수 구현 (model 메타데이터 필터 필수 적용, category 필터 선택 적용)
+- [x] T020 src/rag/vectorstore.py에 기종별 리트리버 팩토리 함수 구현 (model 메타데이터 필터 필수 적용, category 필터는 유지하되 에이전트에서 미사용 — 매뉴얼 PDF가 통합 문서이므로 model 필터만으로 검색)
 - [x] T021 scripts/ingest_manuals.py에 PDF 인제스트 실행 스크립트 구현 (data/manuals/{기종}/ 디렉토리 순회, 기종별 컬렉션에 저장)
 
 ### 프롬프트 및 톤앤매너
@@ -65,7 +70,7 @@
 - [x] T025 src/tools/error_code_tool.py에 lookup_error_code Tool 구현 (model, error_code 파라미터 → DB 조회 → ErrorCode 반환)
 - [x] T026 [P] src/tools/error_code_tool.py에 search_errors_by_symptom Tool 구현 (model, symptom_description → 유사 에러 검색)
 - [x] T027 [P] src/tools/peripheral_tool.py에 check_peripheral_compatibility Tool 구현 (model, peripheral_type, peripheral_name → 호환 정보 반환)
-- [x] T028 src/tools/manual_search_tool.py에 search_manual Tool 구현 (model, category, query → 기종별 벡터 검색, 메타데이터 필터 필수)
+- [x] T028 src/tools/manual_search_tool.py에 search_manual Tool 구현 (model, query → 기종별 벡터 검색, model 메타데이터 필터 필수. category 파라미터는 선택적으로 유지)
 
 **Checkpoint**: 데이터 파이프라인 준비 완료 — User Story 구현 시작 가능
 

@@ -24,6 +24,7 @@ class AgentState(TypedDict):
 
     # RAG 검색 결과
     retrieved_docs: list[str]
+    image_urls: list[str]
 
     # 에러 코드 관련
     error_code: str | None
