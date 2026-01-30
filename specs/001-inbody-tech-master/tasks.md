@@ -161,9 +161,9 @@
 
 **Independent Test**: 측정 결과 신뢰성 질문 시 생리학적 설명 + 면책 문구 포함 응답 확인, 진단 요청 시 거절 확인
 
-- [ ] T053 [US5] src/graph/nodes/clinical_agent.py에 임상 방어 에이전트 노드 구현 (측정 항목 관련 RAG 검색 → 생리학적 변수 설명 생성 → needs_disclaimer=True 설정)
-- [ ] T054 [US5] src/graph/nodes/clinical_agent.py에 의학적 진단 요청 감지 및 거절 로직 구현 (질환 관련 질문 → 진단 불가 안내 + 전문 의료인 상담 권고)
-- [ ] T055 [US5] src/graph/workflow.py에 ClinicalAgent 노드 및 엣지 등록
+- [x] T053 [US5] src/graph/nodes/clinical_agent.py에 임상 방어 에이전트 노드 구현 (측정 항목 관련 RAG 검색 → 생리학적 변수 설명 생성 → needs_disclaimer=True 설정)
+- [x] T054 [US5] src/graph/nodes/clinical_agent.py에 의학적 진단 요청 감지 및 거절 로직 구현 (질환 관련 질문 → 진단 불가 안내 + 전문 의료인 상담 권고)
+- [x] T055 [US5] src/graph/workflow.py에 ClinicalAgent 노드 및 엣지 등록
 
 **Checkpoint**: 임상 방어 흐름이 독립적으로 동작하는 상태
 
