@@ -17,7 +17,7 @@ from src.prompts.disclaimers import HARDWARE_DISCLAIMER, SERVICE_CENTER_INFO
 from src.prompts.system_prompts import TROUBLESHOOT_AGENT_PROMPT
 from src.prompts.tone_profiles import get_tone_instruction
 from src.tools.error_code_tool import lookup_error_code, search_errors_by_symptom
-from src.tools.manual_search_tool import search_manual
+from src.tools.manual_search_tool import extract_image_urls, search_manual
 
 logger = logging.getLogger(__name__)
 
@@ -51,6 +51,7 @@ async def troubleshoot_agent_node(state: AgentState) -> dict:
     # Step 2: 도구 호출로 컨텍스트 수집
     context_parts = []
     support_level = None
+    image_urls: list[str] = []
 
     if error_code:
         # T040: 에러 코드 조회
@@ -77,9 +78,9 @@ async def troubleshoot_agent_node(state: AgentState) -> dict:
         manual_result = search_manual.invoke({
             "model": model_id,
             "query": user_message,
-            "category": "troubleshooting",
         })
         context_parts.append(f"[매뉴얼 검색 결과]\n{manual_result}")
+        image_urls = extract_image_urls(manual_result)
 
     # T043: 에스컬레이션 감지
     if is_escalation:
@@ -128,6 +129,7 @@ async def troubleshoot_agent_node(state: AgentState) -> dict:
         "answer": answer,
         "error_code": error_code,
         "support_level": support_level,
+        "image_urls": image_urls,
     }
 
 

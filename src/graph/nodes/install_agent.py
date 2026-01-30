@@ -14,7 +14,7 @@ from src.models.inbody_models import get_model_profile
 from src.models.state import AgentState
 from src.prompts.system_prompts import INSTALL_AGENT_PROMPT
 from src.prompts.tone_profiles import get_tone_instruction
-from src.tools.manual_search_tool import search_manual
+from src.tools.manual_search_tool import extract_image_urls, search_manual
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +52,6 @@ async def install_agent_node(state: AgentState) -> dict:
     manual_result = search_manual.invoke({
         "model": model_id,
         "query": user_message,
-        "category": "installation",
     })
 
     context_parts = [f"[설치 매뉴얼 검색 결과]\n{manual_result}"]
@@ -99,7 +98,10 @@ async def install_agent_node(state: AgentState) -> dict:
         HumanMessage(content=user_message),
     ])
 
-    return {"answer": response.content}
+    return {
+        "answer": response.content,
+        "image_urls": extract_image_urls(manual_result),
+    }
 
 
 def _is_install_trouble(message: str) -> bool:

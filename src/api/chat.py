@@ -31,6 +31,7 @@ class ChatResponse(BaseModel):
     support_level: str | None = None
     disclaimer_included: bool = False
     sources: list[SourceInfo] = []
+    image_urls: list[str] = []
 
 
 @router.post("/chat", response_model=ChatResponse)
@@ -57,6 +58,7 @@ async def chat(request: ChatRequest):
             "model_tier": None,
             "intent": None,
             "retrieved_docs": [],
+            "image_urls": [],
             "error_code": None,
             "support_level": None,
             "tone_profile": None,
@@ -74,6 +76,7 @@ async def chat(request: ChatRequest):
             support_level=result.get("support_level"),
             disclaimer_included=result.get("needs_disclaimer", False),
             sources=[],
+            image_urls=result.get("image_urls", []),
         )
     except Exception:
         logger.exception("채팅 처리 중 오류 발생")

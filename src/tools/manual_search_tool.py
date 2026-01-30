@@ -1,5 +1,7 @@
 """매뉴얼 RAG 검색 Tool — LangChain Tool Calling 용"""
 
+import re
+
 from langchain_core.tools import tool
 
 from src.rag.metadata import VALID_CATEGORIES, VALID_MODELS
@@ -40,7 +42,20 @@ def search_manual(model: str, query: str, category: str = "") -> str:
     for i, doc in enumerate(docs, 1):
         source = doc.metadata.get("source_file", "알 수 없음")
         page = doc.metadata.get("page_number", "?")
-        lines.append(f"\n--- 결과 {i} (출처: {source}, 페이지: {page}) ---")
+        content_type = doc.metadata.get("content_type", "text")
+        image_url = doc.metadata.get("image_url", "")
+
+        header = f"\n--- 결과 {i} (출처: {source}, 페이지: {page}"
+        if content_type == "image" and image_url:
+            header += f", 이미지: {image_url}"
+        header += ") ---"
+
+        lines.append(header)
         lines.append(doc.page_content)
 
     return "\n".join(lines)
+
+
+def extract_image_urls(search_result: str) -> list[str]:
+    """search_manual 결과 텍스트에서 이미지 URL 목록을 추출한다."""
+    return re.findall(r"이미지: (/static/images/[^)]+)", search_result)

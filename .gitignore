@@ -20,6 +20,9 @@ data/chroma/
 data/inbody.db
 data/manuals/**/*.pdf
 
+# 인제스트 생성 이미지
+static/images/
+
 # IDE
 .idea/
 .vscode/

@@ -1,4 +1,8 @@
-"""PDF 매뉴얼 인제스트 스크립트 — data/manuals/{기종}/ 디렉토리 순회"""
+"""PDF 매뉴얼 인제스트 스크립트 — data/manuals/{기종}/ 디렉토리 순회
+
+사용법:
+    python scripts/ingest_manuals.py
+"""
 
 import logging
 import sys

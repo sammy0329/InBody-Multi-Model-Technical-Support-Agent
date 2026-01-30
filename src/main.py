@@ -3,8 +3,11 @@
 import logging
 from contextlib import asynccontextmanager
 
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from src.config import settings
 
@@ -60,3 +63,8 @@ from src.api.health import router as health_router  # noqa: E402
 app.include_router(chat_router)
 app.include_router(errors_router)
 app.include_router(health_router)
+
+# 정적 파일 서빙 (이미지 등)
+_static_dir = Path(__file__).parent.parent / "static"
+_static_dir.mkdir(exist_ok=True)
+app.mount("/static", StaticFiles(directory=str(_static_dir)), name="static")

@@ -4,7 +4,7 @@ import logging
 from pathlib import Path
 
 from langchain_community.document_loaders import PyPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from src.rag.metadata import create_metadata
 
@@ -44,6 +44,7 @@ def load_and_chunk_pdf(
 
     chunks = []
     for page in pages:
+        page_num = page.metadata.get("page", 0)
         page_chunks = TEXT_SPLITTER.split_text(page.page_content)
         for chunk_text in page_chunks:
             if not chunk_text.strip():
@@ -52,11 +53,11 @@ def load_and_chunk_pdf(
                 model=model,
                 category=category,
                 source_file=pdf_path.name,
-                page_number=page.metadata.get("page", 0),
+                page_number=page_num,
             )
             chunks.append({"text": chunk_text, "metadata": metadata})
 
-    logger.info("청킹 완료: %s → %d개 청크", pdf_path.name, len(chunks))
+    logger.info("텍스트 청킹 완료: %s → %d개 청크", pdf_path.name, len(chunks))
     return chunks
 
 
