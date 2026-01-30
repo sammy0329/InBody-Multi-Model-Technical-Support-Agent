@@ -1,4 +1,4 @@
-"""조건부 엣지 라우팅 함수 — T030, T036"""
+"""조건부 엣지 라우팅 함수 — T030, T036, T055"""
 
 from src.models.state import AgentState
 
@@ -20,7 +20,8 @@ def route_after_intent_router(state: AgentState) -> str:
     - troubleshoot → troubleshoot_agent (Phase 4)
     - install → install_agent (Phase 5)
     - connect → connect_agent (Phase 6)
-    - 그 외 → placeholder_agent (Phase 7에서 전문 에이전트로 대체 예정)
+    - clinical → clinical_agent (Phase 7)
+    - 그 외 → placeholder_agent (Phase 8 이후 확장 예정)
     """
     intent = state.get("intent", "general")
     if intent == "troubleshoot":
@@ -29,4 +30,6 @@ def route_after_intent_router(state: AgentState) -> str:
         return "install_agent"
     if intent == "connect":
         return "connect_agent"
+    if intent == "clinical":
+        return "clinical_agent"
     return "placeholder_agent"
