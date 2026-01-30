@@ -59,10 +59,12 @@ app.add_middleware(
 from src.api.chat import router as chat_router  # noqa: E402
 from src.api.errors import router as errors_router  # noqa: E402
 from src.api.health import router as health_router  # noqa: E402
+from src.api.peripherals import router as peripherals_router  # noqa: E402
 
 app.include_router(chat_router)
 app.include_router(errors_router)
 app.include_router(health_router)
+app.include_router(peripherals_router)
 
 # 정적 파일 서빙 (이미지 등)
 _static_dir = Path(__file__).parent.parent / "static"

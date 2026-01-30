@@ -19,11 +19,14 @@ def route_after_intent_router(state: AgentState) -> str:
 
     - troubleshoot → troubleshoot_agent (Phase 4)
     - install → install_agent (Phase 5)
-    - 그 외 → placeholder_agent (Phase 6~7에서 전문 에이전트로 대체 예정)
+    - connect → connect_agent (Phase 6)
+    - 그 외 → placeholder_agent (Phase 7에서 전문 에이전트로 대체 예정)
     """
     intent = state.get("intent", "general")
     if intent == "troubleshoot":
         return "troubleshoot_agent"
     if intent == "install":
         return "install_agent"
+    if intent == "connect":
+        return "connect_agent"
     return "placeholder_agent"

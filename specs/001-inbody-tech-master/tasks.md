@@ -146,10 +146,10 @@
 
 **Independent Test**: 주변기기 연결 문의 시 호환표 기반 정확한 호환 여부 + 연결 방법 안내 확인
 
-- [ ] T049 [US4] src/graph/nodes/connect_agent.py에 연동 에이전트 노드 구현 (check_peripheral_compatibility Tool 호출 → 호환 여부 확인 → 연결 절차 안내)
-- [ ] T050 [US4] src/graph/nodes/connect_agent.py에 비호환 주변기기 대응 로직 추가 (비호환 사유 설명 + 대안 추천)
-- [ ] T051 [US4] src/api/peripherals.py에 GET /api/v1/models/{model_id}/peripherals 및 상세 호환 엔드포인트 구현
-- [ ] T052 [US4] src/graph/workflow.py에 ConnectAgent 노드 및 엣지 등록
+- [x] T049 [US4] src/graph/nodes/connect_agent.py에 연동 에이전트 노드 구현 (check_peripheral_compatibility Tool 호출 → 호환 여부 확인 → 연결 절차 안내)
+- [x] T050 [US4] src/graph/nodes/connect_agent.py에 비호환 주변기기 대응 로직 추가 (비호환 사유 설명 + 대안 추천)
+- [x] T051 [US4] src/api/peripherals.py에 GET /api/v1/models/{model_id}/peripherals 및 상세 호환 엔드포인트 구현
+- [x] T052 [US4] src/graph/workflow.py에 ConnectAgent 노드 및 엣지 등록
 
 **Checkpoint**: 연동 에이전트 흐름이 독립적으로 동작하는 상태
 
