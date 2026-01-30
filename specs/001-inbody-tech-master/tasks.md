@@ -15,12 +15,12 @@
 
 **Purpose**: 프로젝트 초기화 및 기본 구조 생성
 
-- [ ] T001 프로젝트 루트에 pyproject.toml 생성 (Python 3.11+, 의존성: fastapi, uvicorn, langchain, langgraph, langchain-openai, chromadb, python-dotenv, pydantic, sqlalchemy, httpx)
-- [ ] T002 src/ 디렉토리 구조 생성 (models/, graph/nodes/, tools/, rag/, prompts/, api/, db/)
-- [ ] T003 [P] .env.example 파일 생성 (OPENAI_API_KEY, OPENAI_MODEL, CHROMA_PERSIST_DIR, STRUCTURED_DB_URL, LOG_LEVEL)
-- [ ] T004 [P] src/config.py에 환경 변수 로드 및 설정 클래스 구현 (pydantic-settings 활용)
-- [ ] T005 [P] tests/ 디렉토리 구조 생성 (unit/, integration/, contract/) 및 conftest.py 기본 픽스처 작성
-- [ ] T006 [P] .gitignore 설정 (.env, __pycache__, data/chroma/, *.pyc, .venv/)
+- [x] T001 프로젝트 루트에 pyproject.toml 생성 (Python 3.11+, 의존성: fastapi, uvicorn, langchain, langgraph, langchain-openai, chromadb, python-dotenv, pydantic, sqlalchemy, httpx)
+- [x] T002 src/ 디렉토리 구조 생성 (models/, graph/nodes/, tools/, rag/, prompts/, api/, db/)
+- [x] T003 [P] .env.example 파일 생성 (OPENAI_API_KEY, OPENAI_MODEL, CHROMA_PERSIST_DIR, STRUCTURED_DB_URL, LOG_LEVEL)
+- [x] T004 [P] src/config.py에 환경 변수 로드 및 설정 클래스 구현 (pydantic-settings 활용)
+- [x] T005 [P] tests/ 디렉토리 구조 생성 (unit/, integration/, contract/) 및 conftest.py 기본 픽스처 작성
+- [x] T006 [P] .gitignore 설정 (.env, __pycache__, data/chroma/, *.pyc, .venv/)
 
 ---
 
@@ -196,6 +196,36 @@
 
 ---
 
+## Phase 10: Streamlit 채팅 UI (User Story 6)
+
+**Purpose**: 웹 브라우저에서 사용 가능한 대화형 채팅 인터페이스 구현
+
+**Independent Test**: 브라우저에서 Streamlit UI 접속 → 기종 선택 → 질문 입력 → 스트리밍 응답 확인
+
+- [ ] T068 [US6] ui/api_client.py에 FastAPI 백엔드 HTTP 클라이언트 구현 (POST /chat, POST /chat/stream SSE 수신, GET /health, GET /models)
+- [ ] T069 [US6] ui/components.py에 사이드바 컴포넌트 구현 (기종 선택 selectbox, 이미지 업로드 file_uploader, 세션 초기화 버튼, 시스템 상태 표시)
+- [ ] T070 [US6] ui/app.py에 Streamlit 메인 채팅 앱 구현 (st.chat_message로 대화 이력 표시, st.chat_input으로 메시지 입력, st.session_state로 thread_id 관리)
+- [ ] T071 [US6] ui/app.py에 SSE 스트리밍 응답 연동 구현 (api_client의 stream 함수 → st.write_stream으로 실시간 표시)
+- [ ] T072 [US6] ui/app.py에 이미지 업로드 기종 식별 연동 구현 (file_uploader → base64 인코딩 → /chat API 전송 → 식별 결과 사이드바 반영)
+
+**Checkpoint**: Streamlit UI에서 전체 채팅 흐름이 동작하는 상태
+
+---
+
+## Phase 11: Docker 및 AWS 배포
+
+**Purpose**: Docker Compose 패키징 및 EC2 Spot 배포, 스케줄 자동 운영
+
+- [ ] T073 Dockerfile 생성 (Python 3.11-slim 베이스, pip install, src/ 및 ui/ 복사)
+- [ ] T074 [P] docker-compose.yml 생성 (fastapi-server:8000 + streamlit-ui:8501, 볼륨: data/, 환경변수: .env)
+- [ ] T075 [P] deploy/ec2-userdata.sh에 EC2 초기 설정 스크립트 작성 (Docker/Compose 설치, git clone, docker compose up -d)
+- [ ] T076 deploy/scheduler-cfn.yml에 EventBridge 스케줄 CloudFormation 템플릿 작성 (평일 09:00 시작, 19:00 종료 KST)
+- [ ] T077 docker-compose.yml에 헬스체크 및 자동 재시작 설정 추가 (restart: unless-stopped, healthcheck)
+
+**Checkpoint**: EC2에서 Docker Compose로 전체 시스템이 자동 운영되는 상태
+
+---
+
 ## 의존성 및 실행 순서
 
 ### Phase 의존성
@@ -206,6 +236,8 @@
 - **Phase 4~7 (US2~US5)**: Phase 3 완료 필요 (ModelRouter + IntentRouter + 기본 API 필요)
 - **Phase 8 (Guardrail/통합)**: Phase 3~7 중 최소 1개 이상 완료 필요
 - **Phase 9 (마무리)**: Phase 8 완료 필요
+- **Phase 10 (Streamlit UI)**: Phase 3 완료 필요 (기본 API 엔드포인트 필요) — Phase 4~9와 병렬 가능
+- **Phase 11 (배포)**: Phase 10 + Phase 8 완료 필요 — 최종 단계
 
 ### User Story 의존성
 
@@ -252,6 +284,8 @@ Developer D: Phase 7 (US5 임상 방어)
 5. US4 (연동) → 테스트 → 데모
 6. US5 (임상 방어) → 테스트 → 데모
 7. Guardrail 통합 + 마무리 → 최종 검증
+8. Streamlit UI → 전체 채팅 흐름 연동
+9. Docker + EC2 배포 → 데모 서버 운영 (평일 09:00~19:00 KST)
 
 ---
 
