@@ -18,6 +18,7 @@ venv/
 # 데이터 (로컬 생성)
 data/chroma/
 data/inbody.db
+data/manuals/**/*.pdf
 
 # IDE
 .idea/
