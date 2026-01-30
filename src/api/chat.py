@@ -1,4 +1,4 @@
-"""채팅 API 엔드포인트 — T038, T059, T062"""
+"""채팅 API 엔드포인트 — T038, T059, T062, T063"""
 
 import json
 import logging
@@ -55,16 +55,14 @@ async def chat(request: ChatRequest):
     try:
         workflow = get_compiled_workflow()
 
+        # identified_model, model_tier, tone_profile은 체크포인터에서 턴 간 유지 (T063)
         initial_state = {
             "messages": [HumanMessage(content=request.message)],
-            "identified_model": None,
-            "model_tier": None,
             "intent": None,
             "retrieved_docs": [],
             "image_urls": [],
             "error_code": None,
             "support_level": None,
-            "tone_profile": None,
             "needs_disclaimer": False,
             "answer": None,
             "guardrail_passed": None,
@@ -104,16 +102,14 @@ async def chat_stream(request: ChatRequest):
         try:
             workflow = get_compiled_workflow()
 
+            # identified_model, model_tier, tone_profile은 체크포인터에서 턴 간 유지 (T063)
             initial_state = {
                 "messages": [HumanMessage(content=request.message)],
-                "identified_model": None,
-                "model_tier": None,
                 "intent": None,
                 "retrieved_docs": [],
                 "image_urls": [],
                 "error_code": None,
                 "support_level": None,
-                "tone_profile": None,
                 "needs_disclaimer": False,
                 "answer": None,
                 "guardrail_passed": None,

@@ -1,11 +1,15 @@
 """매뉴얼 RAG 검색 Tool — LangChain Tool Calling 용"""
 
+import logging
 import re
 
 from langchain_core.tools import tool
 
+from src.prompts.disclaimers import SERVICE_CENTER_INFO
 from src.rag.metadata import VALID_CATEGORIES, VALID_MODELS
 from src.rag.vectorstore import get_retriever
+
+logger = logging.getLogger(__name__)
 
 
 @tool
@@ -33,10 +37,30 @@ def search_manual(model: str, query: str, category: str = "") -> str:
         retriever = get_retriever(model=model, category=cat, k=5)
         docs = retriever.invoke(query)
     except Exception as e:
-        return f"매뉴얼 검색 중 오류가 발생했습니다: {e}"
+        logger.warning("매뉴얼 검색 오류 (model=%s, category=%s): %s", model, cat, e)
+        docs = []
 
+    # Level 1 폴백: 카테고리 필터 제거 후 재검색
+    if not docs and cat:
+        logger.info("카테고리 필터 '%s' 제거 후 재검색 (model=%s)", cat, model)
+        try:
+            retriever = get_retriever(model=model, category=None, k=5)
+            docs = retriever.invoke(query)
+        except Exception as e:
+            logger.warning("폴백 검색 오류 (model=%s): %s", model, e)
+            docs = []
+
+    # Level 2 폴백: 구조화된 실패 메시지
     if not docs:
-        return f"기종 {model} 매뉴얼에서 '{query}'에 대한 관련 정보를 찾지 못했습니다."
+        return (
+            f"기종 {model} 매뉴얼에서 '{query}'에 대한 관련 정보를 "
+            f"찾지 못했습니다.\n\n"
+            f"다음 방법을 시도해 보세요:\n"
+            f"- 다른 키워드로 다시 질문해 주세요\n"
+            f"- 구체적인 증상이나 에러 코드를 알려주세요\n\n"
+            f"추가 도움이 필요하시면 InBody 고객센터로 문의해 주세요.\n"
+            f"{SERVICE_CENTER_INFO}"
+        )
 
     lines = [f"기종 {model} 매뉴얼 검색 결과 ({len(docs)}건):"]
     for i, doc in enumerate(docs, 1):

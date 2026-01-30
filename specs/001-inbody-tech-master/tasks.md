@@ -193,11 +193,11 @@
 
 **Purpose**: 전체 시스템 통합 검증, 엣지 케이스 처리, 품질 개선
 
-- [ ] T063 [P] src/graph/nodes/model_router.py에 대화 중 기종 변경 처리 로직 추가 (기종 재식별 → 이전 기종 기반 응답 폐기)
-- [ ] T064 [P] src/graph/edges.py에 기종 비교 질문 감지 로직 추가 ("270S와 580 차이" 같은 질문 시 각 기종 정보 분리 응답)
-- [ ] T065 src/rag/vectorstore.py에 RAG 검색 실패 시 폴백 응답 구현 ("현재 정보 검색에 문제가 있습니다" 안내 + 재시도 제안)
-- [ ] T066 [P] requirements.txt 또는 pyproject.toml 의존성 목록 최종 확인 및 정리
-- [ ] T067 quickstart.md 검증 — 문서 순서대로 클린 환경에서 실행하여 정상 동작 확인
+- [x] T063 [P] src/graph/nodes/model_router.py에 대화 중 기종 변경 처리 로직 추가 (기종 재식별 → 이전 기종 기반 응답 폐기)
+- [x] T064 [P] src/graph/edges.py에 기종 비교 질문 감지 로직 추가 ("270S와 580 차이" 같은 질문 시 각 기종 정보 분리 응답)
+- [x] T065 src/tools/manual_search_tool.py에 RAG 검색 실패 시 폴백 응답 구현 (카테고리 제거 재검색 + 고객센터 안내)
+- [x] T066 [P] pyproject.toml 의존성 목록 최종 확인 — 변경 불필요, 현재 상태 정상
+- [x] T067 quickstart.md 검증 — pip install 명령 및 가상환경 이름 수정
 
 ---
 
