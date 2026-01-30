@@ -1,0 +1,192 @@
+[
+  {
+    "model_id": "270S",
+    "peripheral_type": "printer",
+    "peripheral_name": "InBody 전용 감열식 프린터",
+    "is_compatible": true,
+    "connection_method": "USB",
+    "setup_steps": [
+      "프린터를 InBody 270S의 USB 포트에 연결하세요.",
+      "프린터 전원을 켜세요.",
+      "기기 설정에서 '프린터 연결 확인'을 실행하세요.",
+      "테스트 인쇄를 실행하여 정상 동작을 확인하세요."
+    ]
+  },
+  {
+    "model_id": "270S",
+    "peripheral_type": "pc",
+    "peripheral_name": "Lookin'Body 120",
+    "is_compatible": true,
+    "connection_method": "USB",
+    "setup_steps": [
+      "PC에 Lookin'Body 120 소프트웨어를 설치하세요.",
+      "USB 케이블로 InBody 270S와 PC를 연결하세요.",
+      "Lookin'Body에서 기기 검색을 실행하세요.",
+      "연결된 기기를 선택하고 데이터 동기화를 시작하세요."
+    ]
+  },
+  {
+    "model_id": "270S",
+    "peripheral_type": "barcode_reader",
+    "peripheral_name": "USB 바코드 리더기 (HID 호환)",
+    "is_compatible": true,
+    "connection_method": "USB HID",
+    "setup_steps": [
+      "바코드 리더기를 InBody 270S의 USB 포트에 연결하세요.",
+      "기기가 자동으로 HID 장치를 인식합니다.",
+      "ID 입력 화면에서 바코드를 스캔하여 테스트하세요."
+    ]
+  },
+  {
+    "model_id": "580",
+    "peripheral_type": "printer",
+    "peripheral_name": "InBody 전용 감열식 프린터",
+    "is_compatible": true,
+    "connection_method": "USB",
+    "setup_steps": [
+      "프린터를 InBody 580의 USB 포트에 연결하세요.",
+      "프린터 전원을 켜세요.",
+      "설정 > 프린터에서 연결 상태를 확인하세요.",
+      "테스트 인쇄를 실행하세요."
+    ]
+  },
+  {
+    "model_id": "580",
+    "peripheral_type": "pc",
+    "peripheral_name": "Lookin'Body 120",
+    "is_compatible": true,
+    "connection_method": "USB / LAN",
+    "setup_steps": [
+      "PC에 Lookin'Body 120 소프트웨어를 설치하세요.",
+      "USB 또는 LAN 케이블로 InBody 580과 PC를 연결하세요.",
+      "LAN 연결 시 기기와 PC가 같은 네트워크 대역에 있는지 확인하세요.",
+      "Lookin'Body에서 기기를 검색하고 연결하세요."
+    ]
+  },
+  {
+    "model_id": "580",
+    "peripheral_type": "barcode_reader",
+    "peripheral_name": "USB 바코드 리더기 (HID 호환)",
+    "is_compatible": true,
+    "connection_method": "USB HID",
+    "setup_steps": [
+      "바코드 리더기를 InBody 580의 USB 포트에 연결하세요.",
+      "기기가 자동으로 인식합니다.",
+      "ID 입력 화면에서 바코드를 스캔하여 정상 동작을 확인하세요."
+    ]
+  },
+  {
+    "model_id": "580",
+    "peripheral_type": "usb",
+    "peripheral_name": "USB 메모리 (FAT32)",
+    "is_compatible": true,
+    "connection_method": "USB",
+    "setup_steps": [
+      "FAT32로 포맷된 USB 메모리를 준비하세요.",
+      "InBody 580의 USB 포트에 삽입하세요.",
+      "설정 > 데이터 관리에서 USB 내보내기를 선택하세요."
+    ]
+  },
+  {
+    "model_id": "770S",
+    "peripheral_type": "printer",
+    "peripheral_name": "InBody 전용 감열식 프린터",
+    "is_compatible": true,
+    "connection_method": "USB",
+    "setup_steps": [
+      "프린터를 InBody 770S의 USB 포트에 연결하세요.",
+      "프린터 전원을 켜세요.",
+      "설정 메뉴에서 프린터 유형을 선택하세요 (일반/상세 결과지).",
+      "테스트 인쇄를 실행하세요."
+    ]
+  },
+  {
+    "model_id": "770S",
+    "peripheral_type": "pc",
+    "peripheral_name": "Lookin'Body 120",
+    "is_compatible": true,
+    "connection_method": "USB / LAN / RS-232C",
+    "setup_steps": [
+      "PC에 Lookin'Body 120 소프트웨어를 설치하세요.",
+      "원하는 연결 방식(USB/LAN/RS-232C)으로 기기와 PC를 연결하세요.",
+      "RS-232C 사용 시 USB-to-Serial 변환기와 드라이버 설치가 필요합니다.",
+      "Lookin'Body에서 통신 포트를 설정하고 기기를 검색하세요."
+    ]
+  },
+  {
+    "model_id": "770S",
+    "peripheral_type": "barcode_reader",
+    "peripheral_name": "USB 바코드 리더기 (HID 호환)",
+    "is_compatible": true,
+    "connection_method": "USB HID",
+    "setup_steps": [
+      "바코드 리더기를 InBody 770S의 USB 포트에 연결하세요.",
+      "기기가 자동으로 HID 장치를 인식합니다.",
+      "환자 ID 입력 화면에서 바코드를 스캔하여 테스트하세요."
+    ]
+  },
+  {
+    "model_id": "770S",
+    "peripheral_type": "pc",
+    "peripheral_name": "병원 EMR/HIS 시스템",
+    "is_compatible": true,
+    "connection_method": "LAN (HL7/DICOM)",
+    "setup_steps": [
+      "병원 IT 부서에 InBody 연동 프로토콜(HL7) 정보를 전달하세요.",
+      "InBody 770S 네트워크 설정에서 EMR 서버 IP와 포트를 설정하세요.",
+      "Lookin'Body를 중계 서버로 사용할 수도 있습니다.",
+      "연동 테스트 후 양방향 데이터 전송을 확인하세요."
+    ]
+  },
+  {
+    "model_id": "970S",
+    "peripheral_type": "printer",
+    "peripheral_name": "InBody 전용 감열식 프린터",
+    "is_compatible": true,
+    "connection_method": "USB",
+    "setup_steps": [
+      "프린터를 InBody 970S의 USB 포트에 연결하세요.",
+      "프린터 전원을 켜세요.",
+      "설정에서 결과지 유형을 선택하세요 (임상용/연구용/간편).",
+      "테스트 인쇄를 실행하세요."
+    ]
+  },
+  {
+    "model_id": "970S",
+    "peripheral_type": "pc",
+    "peripheral_name": "Lookin'Body 120",
+    "is_compatible": true,
+    "connection_method": "USB / LAN / RS-232C",
+    "setup_steps": [
+      "PC에 Lookin'Body 120 소프트웨어를 설치하세요.",
+      "원하는 연결 방식으로 기기와 PC를 연결하세요.",
+      "연구 데이터 대량 내보내기는 Lookin'Body의 Export 기능을 사용하세요.",
+      "통신 설정을 확인하고 기기를 검색하세요."
+    ]
+  },
+  {
+    "model_id": "970S",
+    "peripheral_type": "barcode_reader",
+    "peripheral_name": "USB 바코드 리더기 (HID 호환)",
+    "is_compatible": true,
+    "connection_method": "USB HID",
+    "setup_steps": [
+      "바코드 리더기를 InBody 970S의 USB 포트에 연결하세요.",
+      "기기가 자동으로 HID 장치를 인식합니다.",
+      "환자/피험자 ID 입력 화면에서 바코드를 스캔하여 테스트하세요."
+    ]
+  },
+  {
+    "model_id": "970S",
+    "peripheral_type": "pc",
+    "peripheral_name": "병원 EMR/HIS 시스템",
+    "is_compatible": true,
+    "connection_method": "LAN (HL7/DICOM)",
+    "setup_steps": [
+      "병원 IT 부서에 InBody 연동 프로토콜(HL7/DICOM) 정보를 전달하세요.",
+      "InBody 970S 네트워크 설정에서 EMR 서버 정보를 구성하세요.",
+      "DICOM Worklist 연동 시 RIS 서버 정보도 함께 설정하세요.",
+      "연동 테스트 후 양방향 데이터 전송을 확인하세요."
+    ]
+  }
+]
