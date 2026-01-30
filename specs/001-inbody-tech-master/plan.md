@@ -143,7 +143,7 @@ tests/
 START
   │
   ▼
-[ModelRouter] ──── 기종 식별 (텍스트/이미지)
+[ModelRouter] ──── 기종 식별 (텍스트/선택)
   │
   ├── 기종 미식별 → 기종 확인 질문 → END
   ├── 미지원 기종 → 지원 불가 안내 → END
@@ -206,7 +206,7 @@ Layer 3: 후처리 검증
 
 **주요 기능**:
 - `st.chat_message`/`st.chat_input`으로 대화형 채팅 UI
-- 사이드바: 기종 직접 선택, 이미지 업로드, 세션 초기화
+- 사이드바: 기종 직접 선택, 세션 초기화
 - `st.write_stream`으로 SSE 스트리밍 응답 실시간 표시
 - 세션 상태(`st.session_state`)로 thread_id 관리
 
