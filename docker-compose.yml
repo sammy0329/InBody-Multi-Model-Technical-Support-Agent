@@ -1,0 +1,48 @@
+# T074 + T077: FastAPI + Streamlit 듀얼 서비스
+
+services:
+  api:
+    build: .
+    container_name: inbody-api
+    command: >
+      uvicorn src.main:app
+      --host 0.0.0.0
+      --port 8000
+      --workers 2
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./static:/app/static
+    env_file:
+      - .env
+    environment:
+      - PYTHONPATH=/app
+      - CHROMA_PERSIST_DIR=/app/data/chroma
+      - STRUCTURED_DB_URL=sqlite+aiosqlite:////app/data/inbody.db
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+
+  ui:
+    build: .
+    container_name: inbody-ui
+    command: >
+      streamlit run ui/app.py
+      --server.port=8501
+      --server.address=0.0.0.0
+      --server.headless=true
+      --browser.gatherUsageStats=false
+    ports:
+      - "8501:8501"
+    environment:
+      - PYTHONPATH=/app
+      - API_BASE_URL=http://api:8000/api/v1
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped

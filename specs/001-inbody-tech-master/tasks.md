@@ -207,19 +207,15 @@
 
 **Independent Test**: 브라우저에서 Streamlit UI 접속 → 기종 선택 → 질문 입력 → 스트리밍 응답 확인
 
-- [ ] T068 [US6] ui/api_client.py에 FastAPI 백엔드 HTTP 클라이언트 구현 (POST /chat, POST /chat/stream SSE 수신, GET /health, GET /models)
-- [ ] T069 [US6] ui/components.py에 사이드바 컴포넌트 구현 (기종 선택 selectbox, 세션 초기화 버튼, 시스템 상태 표시)
-- [ ] T070 [US6] ui/app.py에 Streamlit 메인 채팅 앱 구현 (st.chat_message로 대화 이력 표시, st.chat_input으로 메시지 입력, st.session_state로 thread_id 관리)
-- [ ] T071 [US6] ui/app.py에 SSE 스트리밍 응답 연동 구현 (api_client의 stream 함수 → st.write_stream으로 실시간 표시)
+- [x] T068 [US6] ui/api_client.py에 FastAPI 백엔드 HTTP 클라이언트 구현 (POST /chat, POST /chat/stream SSE 수신, GET /health, GET /models)
+- [x] T069 [US6] ui/components.py에 사이드바 컴포넌트 구현 (기종 선택 selectbox, 세션 초기화 버튼, 시스템 상태 표시)
+- [x] T070 [US6] ui/app.py에 Streamlit 메인 채팅 앱 구현 (st.chat_message로 대화 이력 표시, st.chat_input으로 메시지 입력, st.session_state로 thread_id 관리)
+- [x] T071 [US6] ui/app.py에 SSE 스트리밍 응답 연동 구현 (api_client의 stream 함수 → st.empty() 점진적 갱신으로 실시간 표시)
 - [REMOVED] T072 [US6] ~~이미지 업로드 기종 식별 연동~~ — 데모 단순화를 위해 제거
 
-### 관리자 PDF 문서 관리 페이지
+### 관리자 PDF 문서 관리 페이지 — MVP 제외
 
-- [ ] T072A [US6] ui/admin.py에 관리자 전용 PDF 관리 페이지 구현 (기종 선택 → 카테고리별 PDF 업로드 UI)
-- [ ] T072B [US6] ui/admin.py에 기종별 3종 카테고리 업로드 슬롯 구현 (매뉴얼: 필수, 프린터 호환리스트: 선택, 측정시 주의사항: 선택/공통)
-- [ ] T072C [US6] src/api/documents.py에 POST /api/v1/documents/upload 엔드포인트 구현 (PDF 수신 → 저장 → 인제스트 트리거)
-- [ ] T072D [US6] src/rag/ingest.py에 업로드된 PDF 실시간 인제스트 함수 추가 (카테고리 메타데이터 태깅 포함)
-- [ ] T072E [US6] ui/admin.py에 기종별 업로드 현황 표시 (각 카테고리별 업로드 상태, 문서명, 인제스트 완료 여부)
+- [DEFERRED] T072A~T072E — MVP 범위에서 제외, 향후 구현 예정
 
 **Checkpoint**: Streamlit UI에서 전체 채팅 흐름이 동작하고, 관리자 페이지에서 PDF 업로드/관리가 가능한 상태
 
@@ -229,11 +225,11 @@
 
 **Purpose**: Docker Compose 패키징 및 EC2 Spot 배포, 스케줄 자동 운영
 
-- [ ] T073 Dockerfile 생성 (Python 3.11-slim 베이스, pip install, src/ 및 ui/ 복사)
-- [ ] T074 [P] docker-compose.yml 생성 (fastapi-server:8000 + streamlit-ui:8501, 볼륨: data/, 환경변수: .env)
-- [ ] T075 [P] deploy/ec2-userdata.sh에 EC2 초기 설정 스크립트 작성 (Docker/Compose 설치, git clone, docker compose up -d)
-- [ ] T076 deploy/scheduler-cfn.yml에 EventBridge 스케줄 CloudFormation 템플릿 작성 (평일 09:00 시작, 19:00 종료 KST)
-- [ ] T077 docker-compose.yml에 헬스체크 및 자동 재시작 설정 추가 (restart: unless-stopped, healthcheck)
+- [x] T073 Dockerfile 생성 (Python 3.11-slim 베이스, multi-stage 빌드, src/ 및 ui/ 복사)
+- [x] T074 [P] docker-compose.yml 생성 (api:8000 + ui:8501, 볼륨: data/, 환경변수: .env)
+- [x] T075 [P] deploy/ec2-userdata.sh에 EC2 초기 설정 스크립트 작성 (Docker/Compose 설치, git clone, docker compose up -d)
+- [x] T076 deploy/scheduler-cfn.yml에 EventBridge 스케줄 CloudFormation 템플릿 작성 (평일 09:00 시작, 19:00 종료 KST)
+- [x] T077 docker-compose.yml에 헬스체크 및 자동 재시작 설정 추가 (restart: unless-stopped, healthcheck)
 
 **Checkpoint**: EC2에서 Docker Compose로 전체 시스템이 자동 운영되는 상태
 
