@@ -192,10 +192,10 @@ graph LR
     end
 
     subgraph Layer3 ["Layer 3: 후처리 격리"]
-        G["가드레일 검증<br/>regex: InBody (다른기종) 감지<br/>→ hard-fail"]
+        G["가드레일 검증<br/>regex: InBody 다른기종 감지<br/>→ hard-fail"]
     end
 
-    Q[사용자 질문<br/>"InBody 770S 에러 E001"] --> Layer1
+    Q["사용자 질문<br/>InBody 770S 에러 E001"] --> Layer1
     Layer1 -->|"770S 컬렉션만 접근"| Layer2
     Layer2 -->|"model=770S 필터"| R[RAG 검색 결과]
     R --> A[에이전트 응답 생성]
@@ -235,7 +235,7 @@ flowchart LR
 
     D -->|Yes| OUT[캐시 저장 → 응답 전달]
     D -->|"No, retry < 2"| FIX[fix_response → 재검증]
-    D -->|"No, retry >= 2"| FALLBACK[안전 폴백 메시지<br/>"고객센터 문의 안내"]
+    D -->|"No, retry >= 2"| FALLBACK["안전 폴백 메시지<br/>고객센터 문의 안내"]
 
     style Deterministic fill:#E8F5E9
     style LLM fill:#FFF3E0
