@@ -14,7 +14,7 @@ else
 fi
 
 # ── 2. 프로젝트 클론 ──
-PROJECT_DIR="/home/ubuntu/inbody-app"
+PROJECT_DIR="/home/ubuntu/InBody-Multi-Model-Technical-Support-Agent"
 if [ ! -d "$PROJECT_DIR" ]; then
     git clone https://github.com/sammy0329/InBody-Multi-Model-Technical-Support-Agent.git "$PROJECT_DIR"
     chown -R ubuntu:ubuntu "$PROJECT_DIR"
@@ -45,9 +45,9 @@ if [ -f "$PROJECT_DIR/.env" ]; then
     echo "InBody Tech-Master 서비스가 시작되었습니다."
 else
     echo "[WARNING] .env 파일이 없습니다. 아래 파일들을 SCP로 복사 후 서비스를 시작하세요:"
-    echo "  scp .env ubuntu@<EC2_IP>:~/inbody-app/.env"
-    echo "  scp -r data/chroma/ ubuntu@<EC2_IP>:~/inbody-app/data/chroma/"
-    echo "  scp data/inbody.db ubuntu@<EC2_IP>:~/inbody-app/data/inbody.db"
+    echo "  scp .env ubuntu@<EC2_IP>:~/InBody-Multi-Model-Technical-Support-Agent/.env"
+    echo "  scp -r data/chroma/ ubuntu@<EC2_IP>:~/InBody-Multi-Model-Technical-Support-Agent/data/chroma/"
+    echo "  scp data/inbody.db ubuntu@<EC2_IP>:~/InBody-Multi-Model-Technical-Support-Agent/data/inbody.db"
     echo ""
     echo "복사 후: sudo systemctl start inbody-api inbody-ui"
 fi
