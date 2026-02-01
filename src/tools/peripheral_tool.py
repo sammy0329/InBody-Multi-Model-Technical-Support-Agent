@@ -56,6 +56,8 @@ async def check_peripheral_compatibility(
         lines.append(f"\n[{row.peripheral_type}] {row.peripheral_name}: {status}")
         if row.connection_method:
             lines.append(f"  연결 방식: {row.connection_method}")
+        if row.notes:
+            lines.append(f"  참고: {row.notes}")
         if row.setup_steps:
             lines.append("  설정 절차:")
             for i, step in enumerate(row.setup_steps, 1):

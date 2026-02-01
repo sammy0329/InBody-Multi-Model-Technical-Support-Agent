@@ -54,6 +54,11 @@ def _render_model_selector() -> str | None:
         st.warning("기종 정보를 불러올 수 없습니다.")
         return None
 
+    # T087: 채팅 내 기종 선택 버튼에서 설정된 값 반영
+    if "_model_from_chat" in st.session_state:
+        _mid = st.session_state.pop("_model_from_chat")
+        st.session_state["model_selector"] = f"InBody {_mid}"
+
     model_options = {m["name"]: m["model_id"] for m in models}
     options = ["선택 안 함"] + list(model_options.keys())
 

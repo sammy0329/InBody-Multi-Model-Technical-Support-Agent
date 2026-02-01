@@ -235,6 +235,36 @@
 
 ---
 
+## Phase 12: UX 개선 및 품질 강화
+
+**Purpose**: 사용자 경험 향상, 응답 품질 강화, 비용 최적화
+
+### 비용 최적화
+
+- [x] T078 모든 에이전트 노드(install, connect, troubleshoot, clinical)의 LLM을 gpt-4o에서 gpt-4o-mini로 전환 (settings.openai_mini_model 참조). 라우터/가드레일은 기존 gpt-4o-mini 유지
+
+### 데이터 보강
+
+- [x] T079 data/seed/peripheral_compatibility.json 레코드 15건 → 25건 확장 (기종별 추가 주변기기 정보 + notes 필드 추가)
+
+### 응답 품질 강화
+
+- [x] T080 src/prompts/system_prompts.py TROUBLESHOOT_AGENT_PROMPT에 에러 코드 환각 방지 규칙 추가 — DB에서 에러 코드를 찾을 수 없으면 절대 추측 금지, '해당 기종에 등록되지 않은 에러 코드' 안내 + 서비스 센터 실제 번호(1588-3930) 반영
+- [x] T081 [P] src/rag/section_map.py에 매뉴얼 섹션 맵 유틸리티 신규 구현 — 기종별 목차 JSON 로드, 키워드 매칭으로 현재 섹션 식별, 인접 섹션(이전/다음) 탐색
+- [x] T082 [P] data/section_maps/{270S,580,770S,970S}.json에 기종별 매뉴얼 목차 구조 JSON 생성 — 대분류(장) > 소분류(절) 계층 + 키워드 배열
+- [x] T083 src/graph/nodes/{install,connect,troubleshoot,clinical}_agent.py에 get_adjacent_sections() 호출 추가 — 검색된 인접 섹션 정보를 [관련 섹션 안내] 컨텍스트로 주입
+- [x] T084 src/prompts/system_prompts.py 4개 에이전트 프롬프트에 섹션 기반 후속 질문 안내 규칙 추가 — [관련 섹션 안내] 정보 활용하여 다음 섹션 관련 후속 질문 1~2개 제안
+
+### UI/UX 개선
+
+- [x] T085 ui/app.py에 웰컴 화면 예시 질문 버튼 추가 — 4개 카테고리(설치/연동/트러블슈팅/측정결과) × 2개 질문, 클릭 시 자동 입력
+- [x] T086 src/api/chat.py SSE 스트리밍에 _STREAMABLE_NODES 필터 추가 — 라우터/가드레일 등 내부 노드의 LLM 토큰이 UI에 노출되지 않도록 에이전트 노드만 스트리밍
+- [x] T087 ui/app.py + ui/components.py에 채팅 내 기종 선택 버튼 기능 추가 — 기종 미선택 시 응답에 4개 기종 버튼 표시, 클릭 시 사이드바 selectbox 동기화 + 원래 질문 기종 prefix 포함 재전송
+
+**Checkpoint**: 섹션 기반 후속 질문, 예시 질문 UI, 에러 코드 환각 방지, 채팅 내 기종 선택 버튼이 적용된 상태
+
+---
+
 ## 의존성 및 실행 순서
 
 ### Phase 의존성
@@ -246,7 +276,8 @@
 - **Phase 8 (Guardrail/통합)**: Phase 3~7 중 최소 1개 이상 완료 필요
 - **Phase 9 (마무리)**: Phase 8 완료 필요
 - **Phase 10 (Streamlit UI)**: Phase 3 완료 필요 (기본 API 엔드포인트 필요) — Phase 4~9와 병렬 가능
-- **Phase 11 (배포)**: Phase 10 + Phase 8 완료 필요 — 최종 단계
+- **Phase 11 (배포)**: Phase 10 + Phase 8 완료 필요
+- **Phase 12 (UX/품질)**: Phase 10 + Phase 11 완료 필요 — 운영 후 개선
 
 ### User Story 의존성
 
