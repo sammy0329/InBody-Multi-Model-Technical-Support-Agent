@@ -13,7 +13,7 @@
   <img src="https://img.shields.io/badge/FastAPI-0.115+-009688?logo=fastapi&logoColor=white" alt="FastAPI" />
   <img src="https://img.shields.io/badge/Streamlit-1.40+-FF4B4B?logo=streamlit&logoColor=white" alt="Streamlit" />
   <img src="https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white" alt="Docker" />
-  <img src="https://img.shields.io/badge/AWS-EC2%20Spot-FF9900?logo=amazonec2&logoColor=white" alt="AWS" />
+  <img src="https://img.shields.io/badge/AWS-EC2%20Free%20Tier-FF9900?logo=amazonec2&logoColor=white" alt="AWS" />
   <img src="https://img.shields.io/badge/Tests-444%20passed-brightgreen" alt="Tests" />
   <img src="https://img.shields.io/badge/SC%20Metrics-9%2F9%20PASS-brightgreen" alt="SC Metrics" />
   <img src="https://img.shields.io/badge/License-MIT-blue" alt="License" />
@@ -46,7 +46,7 @@ InBody 체성분 분석기 4개 기종(270S, 580, 770S, 970S)은 기종마다 �
 | 기종 미특정 시 부정확한 안내 | 텍스트 기반 기종 자동 식별 + 3계층 격리 | `model_router` + 물리/논리/후처리 격리 |
 | Level 3 안전 안내 | 위험 키워드 탐지 → 자동 차단 + 서비스센터 안내 | 가드레일 Check 3 + HARDWARE_DISCLAIMER |
 | 반복 질문 비용 | 시멘틱 캐시로 유사 질문 즉시 응답 (< 200ms) | cosine 0.92 캐시 + 의도별 TTL |
-| 운영 비용 | EC2 Spot + 평일만 운영 | CloudFormation 스케줄러, 월 ~$5 |
+| 운영 비용 | EC2 프리 티어 + 평일만 운영 | CloudFormation 스케줄러 (프리 티어 기간 중 거의 무료) |
 
 ---
 
@@ -59,7 +59,7 @@ InBody 체성분 분석기 4개 기종(270S, 580, 770S, 970S)은 기종마다 �
 - **4단계 가드레일** — 면책 문구 자동 삽입 → 기종 누출 감지 → Level 3 안전 차단 → LLM 정합성 검증
 - **시멘틱 캐시** — 의미적 유사도 기반 응답 캐싱, 기종 격리 + 의도별 TTL 차등 적용
 - **SSE 실시간 스트리밍** — FastAPI → Streamlit 토큰 단위 스트리밍
-- **월 ~$5 AWS 배포** — EC2 Spot + CloudFormation 스케줄러(평일 09-19시 자동 운영)
+- **프리 티어 AWS 배포** — EC2 t3.micro + systemd + CloudFormation 스케줄러(평일 09-19시 자동 운영)
 
 ---
 
@@ -340,8 +340,8 @@ flowchart TD
 | **Structured DB** | SQLite (aiosqlite) | >=0.20 | 에러코드·주변기기 DB |
 | **Backend** | FastAPI | >=0.115 | REST API + SSE 스트리밍 |
 | **Frontend** | Streamlit | >=1.40 | 채팅 UI |
-| **Container** | Docker Compose | - | api + ui 2-서비스 구성 |
-| **Cloud** | AWS EC2 Spot (t3.small) | - | 월 ~$5 운영 |
+| **Container** | Docker Compose (로컬) / systemd (EC2) | - | 로컬: Docker, EC2: venv + systemd |
+| **Cloud** | AWS EC2 (t3.micro, 프리 티어) | - | 평일 09-19시 자동 운영 |
 | **IaC** | CloudFormation | - | EventBridge + Lambda 스케줄러 |
 | **Testing** | pytest | >=8.0 | 444 테스트, 커스텀 SC 메트릭 |
 | **Linting** | Ruff | >=0.8 | Python 린팅 (line-length=100) |
@@ -417,7 +417,9 @@ InBody-Multi-Model-Technical-Support-Agent/
 │   ├── section_maps/              # 매뉴얼 목차 구조
 │   └── chroma/                    # ChromaDB 영속 저장소
 ├── deploy/
-│   ├── ec2-userdata.sh            # EC2 초기 프로비저닝
+│   ├── ec2-userdata.sh            # EC2 초기 프로비저닝 (venv + systemd)
+│   ├── inbody-api.service         # FastAPI systemd unit
+│   ├── inbody-ui.service          # Streamlit systemd unit
 │   └── scheduler-cfn.yml          # CloudFormation 스케줄러
 ├── Dockerfile                     # 멀티스테이지 빌드
 ├── docker-compose.yml             # api + ui 2-서비스
@@ -502,8 +504,16 @@ docker compose up -d
 ### AWS EC2
 
 ```bash
-# EC2 Spot 인스턴스 (t3.small, ~$5/월)
-# deploy/ec2-userdata.sh로 자동 프로비저닝
+# EC2 t3.micro (프리 티어) + venv + systemd
+# deploy/ec2-userdata.sh로 자동 프로비저닝 (Docker 미사용)
+
+# 데이터 전송 (로컬 → EC2)
+scp -i my-keypair.pem .env ubuntu@<EC2_IP>:~/InBody-Multi-Model-Technical-Support-Agent/
+scp -i my-keypair.pem -r data/chroma/ ubuntu@<EC2_IP>:~/InBody-Multi-Model-Technical-Support-Agent/data/
+scp -i my-keypair.pem data/inbody.db ubuntu@<EC2_IP>:~/InBody-Multi-Model-Technical-Support-Agent/data/
+
+# 서비스 시작
+sudo systemctl start inbody-api inbody-ui
 
 # CloudFormation 스케줄러 (평일 09-19시 KST)
 aws cloudformation deploy \
