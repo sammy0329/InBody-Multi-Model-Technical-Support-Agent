@@ -248,6 +248,117 @@ AWS EC2 Spot (t3.small, ap-northeast-2)
 - `deploy/ec2-userdata.sh` — EC2 초기 설정 스크립트
 - `deploy/scheduler.tf` 또는 `deploy/scheduler-cfn.yml` — EventBridge 스케줄 IaC
 
+## 시멘틱 캐싱 아키텍처
+
+### 동기
+
+현재 요청당 LLM 호출 2~8회 (일반: 4회). 기술 지원 질문의 반복성이 높아(같은 기종의 같은 에러 코드, 같은 프린터 연결 방법), 의미적 유사도 기반 응답 캐싱으로 LLM 비용과 지연 시간을 대폭 절감할 수 있다.
+
+### 캐시 삽입 지점
+
+```text
+[사용자 질문]
+      │
+      ▼
+[ModelRouter] ── 기종 식별 (정규식 사전 매칭 또는 LLM)
+      │
+      ▼
+[SemanticCache] ── 기종+질문 임베딩으로 캐시 조회
+      │
+      ├── HIT (유사도 ≥ 0.92)  → 캐시된 응답 즉시 반환 → END
+      │
+      └── MISS → [IntentRouter] → [Agent] → [Guardrail] → 캐시 저장 → END
+```
+
+ModelRouter 이후에 삽입하는 이유: 캐시 키에 `identified_model`이 필수이므로, 기종 식별은 항상 먼저 수행해야 한다. ModelRouter의 정규식 사전 매칭은 LLM을 호출하지 않으므로 비용이 없다.
+
+### 캐시 키 설계
+
+```python
+cache_key = embedding(user_message)  # 의미적 유사도용 벡터
+cache_filter = {
+    "identified_model": "770S",      # 기종 격리 (필수)
+}
+```
+
+- 기종별 격리: `identified_model` 메타데이터 필터로 다른 기종의 캐시와 완전 분리
+- 유사도 임계값: 0.92 (코사인 유사도) — 높을수록 정확하나 히트율 감소
+
+### 캐시 저장 구조
+
+기존 Chroma 인프라를 재사용한다. 새 컬렉션 `semantic_cache` 생성:
+
+```python
+# document.page_content = user_message (임베딩 원본)
+# document.metadata:
+{
+    "identified_model": str,          # 기종 ID
+    "intent": str,                    # 의도 (TTL 결정용)
+    "response": str,                  # 캐시된 응답 (JSON)
+    "support_level": str | None,
+    "guardrail_passed": True,         # 가드레일 통과 응답만 캐시
+    "image_urls": str,                # JSON 직렬화
+    "disclaimer_included": bool,
+    "created_at": int,                # Unix timestamp
+    "hit_count": int,                 # 히트 카운터
+}
+```
+
+### 의도별 TTL 정책
+
+| 의도 | TTL | 근거 |
+|------|-----|------|
+| troubleshoot | 7일 | 에러코드 해결책은 안정적이나, DB 업데이트 가능 |
+| install | 30일 | 설치 절차는 거의 변하지 않음 |
+| connect | 14일 | 호환표가 펌웨어 업데이트로 변경될 수 있음 |
+| clinical | 90일 | 생리학적 변수 설명은 장기간 안정적 |
+| general | 30일 | 일반 질문 |
+
+### SSE 스트리밍 호환
+
+캐시 히트 시 스트리밍 엔드포인트 처리:
+
+```python
+# 캐시 히트 → 전체 응답을 단일 토큰 이벤트 + done 이벤트로 전송
+if cache_hit:
+    yield f"data: {json.dumps({'type': 'token', 'content': cached_response})}\n\n"
+    yield f"data: {json.dumps({'type': 'done', 'response': cached_response, 'cache_hit': True, ...})}\n\n"
+    return
+```
+
+### 캐시 무효화
+
+1. **TTL 만료**: 의도별 TTL에 따라 자동 무효화 (조회 시 timestamp 확인)
+2. **수동 무효화**: `DELETE /api/v1/cache?model=770S&intent=troubleshoot`
+3. **전체 무효화**: `DELETE /api/v1/cache` (시드 데이터 변경 시)
+
+### 설정
+
+```python
+# config.py 추가 필드
+enable_semantic_cache: bool = True
+cache_similarity_threshold: float = 0.92
+cache_max_entries: int = 10000
+cache_ttl_troubleshoot: int = 604800      # 7일 (초)
+cache_ttl_install: int = 2592000          # 30일
+cache_ttl_connect: int = 1209600          # 14일
+cache_ttl_clinical: int = 7776000         # 90일
+cache_ttl_general: int = 2592000          # 30일
+```
+
+### 프로젝트 구조 추가
+
+```text
+src/
+├── cache/
+│   └── semantic_cache.py        # 시멘틱 캐시 모듈 (조회/저장/무효화)
+├── api/
+│   └── cache_api.py             # 캐시 관리 엔드포인트 (무효화, 통계)
+└── graph/
+    └── nodes/
+        └── cache_node.py        # LangGraph 캐시 노드 (워크플로우 통합)
+```
+
 ## Complexity Tracking
 
 > 헌법 검증 위반 없음. 기록 불필요.

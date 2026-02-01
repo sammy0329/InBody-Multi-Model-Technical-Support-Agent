@@ -2,7 +2,7 @@
 
 **작성일**: 2026-02-01
 **테스트 환경**: Python 3.11.7, pytest 9.0.2, macOS
-**총 테스트 케이스**: 385 passed in 2.11s
+**총 테스트 케이스**: 444 passed in 2.11s
 
 ---
 
@@ -18,6 +18,9 @@ spec.md에 정의된 성공 기준(SC)별 정량적 달성 결과:
 | SC-005 | 기종 간 정보 격리 | 16/16 | 100.0% | = 100% | PASS |
 | SC-006 | Level 3 안전 차단율 | 24/24 | 100.0% | = 100% | PASS |
 | SC-009 | 할루시네이션 방지율 | 21/21 | 100.0% | = 100% | PASS |
+| SC-010 | 캐시 히트율 | 10/10 | 100.0% | >= 60% | PASS |
+| SC-011 | 캐시 응답 지연 | 8/8 | 100.0% | = 100% | PASS |
+| SC-012 | 캐시 교차 오염 | 25/25 | 100.0% | = 100% | PASS |
 
 > 전체 SC 메트릭은 `pytest tests/ -v` 실행 시 터미널 하단에 자동 출력된다.
 
@@ -35,6 +38,7 @@ tests/
 │   ├── test_guardrail_deterministic.py  # SC-004, SC-005, SC-006 가드레일
 │   ├── test_troubleshoot_utils.py       # SC-009 보조 (에러코드 추출, 에스컬레이션)
 │   ├── test_edges.py                    # 라우팅 분기 정확성
+│   ├── test_semantic_cache.py           # 시멘틱 캐시 단위 테스트
 │   ├── test_tone_profiles.py            # 톤앤매너 매핑
 │   ├── test_clinical_utils.py           # 진단 요청 감지
 │   ├── test_connect_utils.py            # 주변기기 유형/이름 추출
@@ -50,14 +54,17 @@ tests/
     ├── test_sc004_disclaimer.py
     ├── test_sc005_model_isolation.py
     ├── test_sc006_level3_safety.py
-    └── test_sc009_hallucination.py
+    ├── test_sc009_hallucination.py
+    ├── test_sc010_cache_hit.py
+    ├── test_sc011_cache_latency.py
+    └── test_sc012_cache_isolation.py
 ```
 
 ---
 
 ## 테스트 상세
 
-### Unit Tests (194 케이스)
+### Unit Tests (224 케이스)
 
 #### test_model_router.py — SC-001 기종 식별
 
@@ -96,9 +103,26 @@ ChatOpenAI를 mock하여 LLM Check 4를 우회하고, 결정론적 Check 1~3만 
 
 | 함수 | 검증 | 케이스 수 |
 |---|---|---|
-| `route_after_model_router` | answer→END, identified→intent_router, empty→END | 4 |
+| `route_after_model_router` | answer→END, identified→cache_lookup, empty→END | 4 |
+| `route_after_cache_lookup` | hit→END, miss→intent_router, no flag→intent_router | 3 |
 | `route_after_intent_router` | 5개 의도→5개 전문 에이전트 매핑 + unknown 폴백 | 7 |
-| `route_after_guardrail` | passed→END, retry<2→fix, retry>=2→END | 4 |
+| `route_after_guardrail` | passed→cache_store, retry<MAX→fix, retry>=MAX→cache_store | 4 |
+
+#### test_semantic_cache.py — 시멘틱 캐시 (27 케이스)
+
+인메모리 Chroma + FakeEmbeddings(동일 문자열 → 동일 벡터)를 사용한 결정론적 테스트. LLM 키 불필요.
+
+| 테스트 클래스 | 검증 | 케이스 수 |
+|---|---|---|
+| `TestStoreAndLookup` | store 반환값, exact match lookup, miss, empty | 4 |
+| `TestModelIsolation` | 6개 기종 조합 교차 격리 + 동일 기종 hit | 8 |
+| `TestGuardrailFilter` | guardrail_passed=False 저장 차단 | 2 |
+| `TestTTLExpiration` | TTL 초과 시 자동 삭제, 이내 시 hit | 2 |
+| `TestInvalidate` | 기종별/기종+의도별 삭제, 빈 삭제 | 3 |
+| `TestGetStats` | 빈 통계, 저장 후 통계, 히트 후 통계 | 3 |
+| `TestCacheDisabled` | 비활성화 시 store/lookup → None | 2 |
+| `TestHitCounter` | 조회 시 hit_count 증가 | 1 |
+| `TestImageUrls` | image_urls 직렬화/역직렬화, 빈 배열 | 2 |
 
 #### test_tone_profiles.py — 톤앤매너
 
@@ -149,7 +173,7 @@ Seeded in-memory DB 기반.
 
 ---
 
-### Evaluation Tests (166 케이스)
+### Evaluation Tests (195 케이스)
 
 SC 메트릭을 직접 생성하는 평가 테스트. 모든 테스트에서 `sc_metrics.record("SC-XXX", passed)`를 호출하여 메트릭 리포트에 반영.
 
@@ -225,6 +249,37 @@ Seeded in-memory DB 기반.
 - 12개 미등록 에러코드 → "찾을 수 없습니다" 확인 (추측 응답 0%)
 - 9개 등록 에러코드 → "해결 단계" 포함 확인 (정상 조회)
 
+#### test_sc010_cache_hit.py (11 케이스)
+
+인메모리 Chroma + FakeEmbeddings를 사용한 캐시 히트율 측정. 동일 질문 store 후 lookup 시 캐시 히트 여부 검증.
+
+| 시나리오 | 케이스 수 | 검증 |
+|---|---|---|
+| 10개 시나리오별 캐시 히트 | 10 | store → 동일 query lookup → entry ≠ None, 응답 일치 |
+| 첫 질문 캐시 미스 | 1 | 빈 캐시 lookup → None (기대된 미스) |
+
+**4개 기종 × 4개 의도 + 긴 응답 2개 = 10개 시나리오.**
+
+#### test_sc011_cache_latency.py (8 케이스)
+
+캐시 히트 시 응답 지연이 200ms 이하인지 `time.perf_counter()`로 측정.
+
+| 시나리오 | 케이스 수 | 검증 |
+|---|---|---|
+| 일반 응답 (5종) | 5 | lookup ≤ 200ms |
+| 긴 응답 (5000자, 3종) | 3 | lookup ≤ 200ms |
+
+#### test_sc012_cache_isolation.py (10 케이스)
+
+동일 질문을 4개 기종에 각각 저장한 후, 기종 필터가 정확히 동작하는지 검증.
+
+| 테스트 | 케이스 수 | 검증 |
+|---|---|---|
+| `test_cache_hit_returns_correct_model` | 4 | 4개 기종별 조회 → 해당 기종 응답만 반환 |
+| `test_no_other_model_response` | 4 | 응답에 다른 기종명 미포함 확인 |
+| `test_single_model_store_not_returned_for_other` | 1 | 770S 전용 캐시 → 다른 기종 조회 시 미스 |
+| `test_invalidate_one_model_does_not_affect_others` | 1 | 770S 삭제 → 나머지 캐시 유지 확인 |
+
 ---
 
 ## 테스트 중 발견한 이슈
@@ -276,6 +331,9 @@ pytest tests/evaluation/ -v
 pytest -m sc001 -v    # 기종 식별
 pytest -m sc003 -v    # 에러코드 해결 정확도
 pytest -m sc005 -v    # 기종 격리
+pytest -m sc010 -v    # 캐시 히트율
+pytest -m sc011 -v    # 캐시 응답 지연
+pytest -m sc012 -v    # 캐시 교차 오염
 
 # 커버리지 포함
 pytest tests/ --cov=src --cov-report=term-missing
@@ -289,6 +347,8 @@ pytest tests/ --cov=src --cov-report=term-missing
 
 2. **Seeded In-Memory DB**: `error_codes.json`과 `peripheral_compatibility.json`을 인메모리 SQLite에 시딩하여, 실제 DB 의존성 없이 도구 레벨 end-to-end 검증.
 
-3. **parametrize 활용**: 소수의 테스트 함수로 385개 케이스 커버. 새 에러코드나 주변기기 추가 시 JSON에만 항목 추가하면 자동 반영.
+3. **parametrize 활용**: 소수의 테스트 함수로 444개 케이스 커버. 새 에러코드나 주변기기 추가 시 JSON에만 항목 추가하면 자동 반영.
 
 4. **3중 키워드 검증**: 단순 형식 검증이 아닌, 매뉴얼에서 반드시 포함되어야 하는 기술 키워드를 수동 정의하여 **내용 정확도** 측정.
+
+5. **인메모리 벡터 DB**: 시멘틱 캐시 테스트는 `chromadb.Client()` 인메모리 + FakeEmbeddings(동일 문자열 → 동일 벡터)를 사용하여, 외부 의존 없이 캐시 격리·TTL·히트율·지연 검증.

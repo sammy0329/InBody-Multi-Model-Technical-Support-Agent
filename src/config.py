@@ -17,6 +17,16 @@ class Settings(BaseSettings):
     # Structured DB (SQLite / PostgreSQL)
     structured_db_url: str = "sqlite+aiosqlite:///./data/inbody.db"
 
+    # 시멘틱 캐시
+    enable_semantic_cache: bool = True
+    cache_similarity_threshold: float = 0.92
+    cache_max_entries: int = 10000
+    cache_ttl_troubleshoot: int = 604800  # 7일 (초)
+    cache_ttl_install: int = 2592000  # 30일
+    cache_ttl_connect: int = 1209600  # 14일
+    cache_ttl_clinical: int = 7776000  # 90일
+    cache_ttl_general: int = 2592000  # 30일
+
     # 로깅
     log_level: str = "INFO"
 

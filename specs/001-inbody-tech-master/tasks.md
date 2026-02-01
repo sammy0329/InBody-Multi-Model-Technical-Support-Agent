@@ -265,6 +265,93 @@
 
 ---
 
+## Phase 13: 테스트 스위트 구현
+
+**Purpose**: 3계층 테스트(Unit/Contract/Evaluation)로 SC 메트릭 전수 검증 — LLM API 키 없이 결정론적 테스트만으로 성공 기준 달성률 측정
+
+### 테스트 인프라
+
+- [x] T088 tests/conftest.py에 SCMetricsCollector 구현 — SC별 pass/fail 누적, pytest_terminal_summary 훅으로 세션 종료 시 SC 리포트 자동 출력
+- [x] T089 [P] pyproject.toml에 pytest markers 추가 — unit, contract, evaluation, sc001~sc009 마커 등록
+
+### Unit 테스트 (194 케이스)
+
+- [x] T090 [P] tests/unit/test_model_router.py — SC-001 기종 식별 정규식 검증 (_pre_extract_model 40개 한국어 패턴 + _extract_all_models 비교 질문 감지 + _build_comparison_response 구조)
+- [x] T091 [P] tests/unit/test_guardrail_deterministic.py — SC-004/SC-005/SC-006 가드레일 결정론적 체크 검증 (면책 문구 자동 삽입, 4x4 기종 격리, UNSAFE_REPAIR_KEYWORDS 감지, 최대 재시도 폴백)
+- [x] T092 [P] tests/unit/test_troubleshoot_utils.py — SC-009 보조 검증 (_extract_error_code 14패턴 + _is_escalation 18키워드)
+- [x] T093 [P] tests/unit/test_edges.py — 라우팅 분기 정확성 (route_after_model_router/intent_router/guardrail 15케이스)
+- [x] T094 [P] tests/unit/test_tone_profiles.py — 톤앤매너 매핑 (casual/professional 내용 + 4기종별 톤+티어)
+- [x] T095 [P] tests/unit/test_clinical_utils.py — 진단 요청 감지 (DIAGNOSIS_KEYWORDS 18개 양성 + 일반 질문 5개 음성)
+- [x] T096 [P] tests/unit/test_connect_utils.py — 주변기기 추출 (_extract_peripheral_type 14패턴 + _extract_peripheral_name 8패턴)
+- [x] T097 [P] tests/unit/test_install_utils.py — 설치 문제 감지 (INSTALL_TROUBLE_KEYWORDS 양성 + 일반 질문 음성)
+
+### Contract 테스트 (11 케이스)
+
+- [x] T098 [P] tests/contract/test_models_api.py — GET /models 엔드포인트 계약 검증 (4기종 반환, 응답 필드 구조, 270S 상세, 404 미지원)
+- [x] T099 [P] tests/contract/test_errors_api.py — GET /models/{id}/errors 엔드포인트 계약 검증 (Seeded DB 기반, 에러 목록/상세/404/400)
+
+### Evaluation 테스트 (166 케이스)
+
+- [x] T100 tests/evaluation/conftest.py에 seeded_session_factory 픽스처 구현 — error_codes.json + peripheral_compatibility.json을 인메모리 SQLite에 시딩
+- [x] T101 [P] tests/evaluation/test_sc001_model_identification.py — SC-001 기종 식별 정확도 40케이스 (4기종 × 10패턴, sc_metrics.record 연동)
+- [x] T102 [P] tests/evaluation/test_sc003_error_resolution.py — SC-003 에러코드 해결 정확도 20케이스 (4기종 × 5코드, 제목/레벨/해결 키워드 3중 검증)
+- [x] T103 [P] tests/evaluation/test_sc003_peripheral_compat.py — SC-003 호환표 정확도 25케이스 (4기종 × 주변기기, 호환상태/연결방식/설정 키워드 3중 검증)
+- [x] T104 [P] tests/evaluation/test_sc004_disclaimer.py — SC-004 면책 문구 삽입률 20케이스 (임상 15건 포함 확인 + 비임상 5건 미포함 확인)
+- [x] T105 [P] tests/evaluation/test_sc005_model_isolation.py — SC-005 기종 격리 16케이스 (4x4 조합, 교차 12건 위반 감지 + 동일 4건 통과)
+- [x] T106 [P] tests/evaluation/test_sc006_level3_safety.py — SC-006 Level 3 안전 차단율 24케이스 (unsafe 8건 차단 + safe 8건 보존 + Level 1 오탐 방지 8건)
+- [x] T107 [P] tests/evaluation/test_sc009_hallucination.py — SC-009 할루시네이션 방지율 21케이스 (미등록 12건 거부 + 등록 9건 정상 조회)
+
+### 문서화
+
+- [x] T108 docs/test-report.md에 테스트 아키텍처, SC 메트릭 결과, 발견 이슈, 실행 방법 문서화
+
+**Checkpoint**: 385 케이스 전수 통과, SC-001~SC-009 달성률 100%, LLM 키 불필요
+
+---
+
+## Phase 14: 시멘틱 캐싱 (User Story 7)
+
+**Purpose**: 의미적 유사도 기반 응답 캐싱으로 LLM 호출 비용 절감 — 동일/유사 질문 반복 시 캐시된 응답 즉시 반환
+
+**Independent Test**: 동일 질문 2회 전송 시 2번째는 캐시 히트로 200ms 이내 응답, 다른 기종 캐시 교차 오염 0%
+
+### 캐시 인프라
+
+- [x] T109 [US7] src/config.py에 시멘틱 캐시 설정 추가 (CACHE_ENABLED, CACHE_SIMILARITY_THRESHOLD=0.92, CACHE_TTL_TROUBLESHOOT=7d, CACHE_TTL_INSTALL=30d, CACHE_TTL_CONNECT=14d, CACHE_TTL_CLINICAL=90d)
+- [x] T110 [US7] src/models/state.py AgentState에 cache_hit: bool, cache_key: str | None 필드 추가
+
+### 캐시 모듈
+
+- [x] T111 [US7] src/cache/semantic_cache.py에 SemanticCache 클래스 구현 — Chroma semantic_cache 컬렉션 초기화, OpenAI embedding 재사용
+- [x] T112 [US7] src/cache/semantic_cache.py에 lookup() 메서드 구현 — model_id 메타데이터 필터 + cosine similarity ≥ 임계값(기본 0.92) 조회, TTL 만료 자동 필터링
+- [x] T113 [US7] src/cache/semantic_cache.py에 store() 메서드 구현 — guardrail_passed=True 응답만 저장, intent별 TTL 메타데이터 포함, model_id 격리
+- [x] T114 [US7] [P] src/cache/semantic_cache.py에 invalidate() 메서드 구현 — 기종별 전체 삭제 또는 기종+의도 조합 선택 삭제
+- [x] T115 [US7] [P] src/cache/semantic_cache.py에 get_stats() 메서드 구현 — 기종별 캐시 항목 수, 히트율 통계
+
+### LangGraph 워크플로우 통합
+
+- [x] T116 [US7] src/graph/nodes/cache_node.py에 cache_lookup 노드 구현 — ModelRouter 이후 캐시 조회, 히트 시 state.cache_hit=True + state.answer 설정
+- [x] T117 [US7] src/graph/nodes/cache_node.py에 cache_store 노드 구현 — Guardrail 통과 후 응답을 캐시에 저장
+- [x] T118 [US7] src/graph/workflow.py에 캐시 노드 통합 — ModelRouter → CacheLookup →(히트: END, 미스: IntentRouter), Guardrail → CacheStore → END
+- [x] T119 [US7] src/graph/edges.py에 cache_lookup 이후 조건부 엣지 추가 — cache_hit=True → END, False → IntentRouter
+
+### API 연동
+
+- [x] T120 [US7] src/api/cache_api.py에 캐시 관리 엔드포인트 구현 — DELETE /api/v1/cache/{model_id} (전체 무효화), DELETE /api/v1/cache/{model_id}/{intent} (선택 무효화), GET /api/v1/cache/stats (통계)
+- [x] T121 [US7] src/api/chat.py SSE 스트리밍에 캐시 히트 처리 추가 — cache_hit 시 전체 응답을 단일 token 이벤트로 즉시 전송 + done 이벤트에 cache_hit=true 포함
+- [x] T122 [US7] src/main.py에 cache_api 라우터 등록
+
+### 테스트
+
+- [x] T123 [US7] [P] tests/unit/test_semantic_cache.py에 캐시 모듈 단위 테스트 — lookup/store/invalidate/TTL 만료/기종 격리 검증
+- [x] T124 [US7] [P] tests/evaluation/test_sc010_cache_hit.py에 SC-010 캐시 히트율 평가 테스트 — 동일 질문 반복 시 히트 확인
+- [x] T125 [US7] [P] tests/evaluation/test_sc011_cache_latency.py에 SC-011 캐시 응답 지연 평가 — 히트 시 200ms 이하 확인
+- [x] T126 [US7] [P] tests/evaluation/test_sc012_cache_isolation.py에 SC-012 캐시 교차 오염 평가 — 다른 기종 캐시 반환 0% 확인
+
+**Checkpoint**: 시멘틱 캐시 동작, 히트율 ≥60%, 응답 지연 ≤200ms, 교차 오염 0%
+
+---
+
 ## 의존성 및 실행 순서
 
 ### Phase 의존성
@@ -278,6 +365,8 @@
 - **Phase 10 (Streamlit UI)**: Phase 3 완료 필요 (기본 API 엔드포인트 필요) — Phase 4~9와 병렬 가능
 - **Phase 11 (배포)**: Phase 10 + Phase 8 완료 필요
 - **Phase 12 (UX/품질)**: Phase 10 + Phase 11 완료 필요 — 운영 후 개선
+- **Phase 13 (테스트)**: Phase 12 완료 필요 — SC 메트릭 전수 검증
+- **Phase 14 (시멘틱 캐싱)**: Phase 8 완료 필요 (Guardrail 노드 + 워크플로우 통합 필요) — Phase 13과 독립적으로 병렬 가능
 
 ### User Story 의존성
 
@@ -286,6 +375,7 @@
 - **US3 (설치 도우미)**: US1 완료 필요 — US2와 독립적으로 병렬 가능
 - **US4 (연동)**: US1 완료 필요 — US2, US3와 독립적으로 병렬 가능
 - **US5 (임상 방어)**: US1 완료 필요 — US2, US3, US4와 독립적으로 병렬 가능
+- **US7 (시멘틱 캐싱)**: Phase 8 (Guardrail 통합) 완료 필요 — 캐시 저장 시 guardrail_passed 확인 필수
 
 ### 병렬 실행 기회
 

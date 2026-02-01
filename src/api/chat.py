@@ -1,4 +1,4 @@
-"""채팅 API 엔드포인트 — T038, T059, T062, T063"""
+"""채팅 API 엔드포인트 — T038, T059, T062, T063, T121"""
 
 import json
 import logging
@@ -35,6 +35,7 @@ class ChatResponse(BaseModel):
     guardrail_passed: bool | None = None
     sources: list[SourceInfo] = []
     image_urls: list[str] = []
+    cache_hit: bool = False
 
 
 @router.post("/chat", response_model=ChatResponse)
@@ -69,6 +70,8 @@ async def chat(request: ChatRequest):
             "guardrail_retry_count": 0,
             "guardrail_violations": [],
             "guardrail_suggestion": None,
+            "cache_hit": False,
+            "cache_key": None,
         }
 
         config = {"configurable": {"thread_id": request.thread_id}}
@@ -83,6 +86,7 @@ async def chat(request: ChatRequest):
             guardrail_passed=result.get("guardrail_passed"),
             sources=[],
             image_urls=result.get("image_urls", []),
+            cache_hit=result.get("cache_hit", False),
         )
     except Exception:
         logger.exception("채팅 처리 중 오류 발생")
@@ -91,7 +95,7 @@ async def chat(request: ChatRequest):
 
 @router.post("/chat/stream")
 async def chat_stream(request: ChatRequest):
-    """SSE 스트리밍으로 AI 에이전트 응답을 반환한다 (T059)."""
+    """SSE 스트리밍으로 AI 에이전트 응답을 반환한다 (T059, T121)."""
     if not request.message.strip() or not request.thread_id.strip():
         raise HTTPException(
             status_code=400,
@@ -116,24 +120,42 @@ async def chat_stream(request: ChatRequest):
                 "guardrail_retry_count": 0,
                 "guardrail_violations": [],
                 "guardrail_suggestion": None,
+                "cache_hit": False,
+                "cache_key": None,
             }
 
             config = {"configurable": {"thread_id": request.thread_id}}
 
-            # 사용자에게 토큰을 스트리밍할 노드 (라우터/가드레일 제외)
+            # 사용자에게 토큰을 스트리밍할 노드 (라우터/가드레일/캐시 제외)
             _STREAMABLE_NODES = {
                 "install_agent", "connect_agent",
                 "troubleshoot_agent", "clinical_agent",
                 "placeholder_agent", "fix_response",
             }
 
+            # 캐시 히트 감지용 플래그
+            cache_hit_detected = False
+
             async for event in workflow.astream_events(
                 initial_state, config=config, version="v2"
             ):
                 kind = event.get("event")
 
-                # LLM 토큰 스트리밍 — 에이전트 노드만 필터
-                if kind == "on_chat_model_stream":
+                # cache_lookup 노드 완료 시 캐시 히트 감지 (T121)
+                if kind == "on_chain_end" and event.get("name") == "cache_lookup":
+                    output = event.get("data", {}).get("output", {})
+                    if output.get("cache_hit"):
+                        cache_hit_detected = True
+                        # 캐시 히트: 전체 응답을 단일 토큰 이벤트로 즉시 전송
+                        cached_response = output.get("answer", "")
+                        payload = json.dumps(
+                            {"type": "token", "content": cached_response},
+                            ensure_ascii=False,
+                        )
+                        yield f"data: {payload}\n\n"
+
+                # LLM 토큰 스트리밍 — 에이전트 노드만 필터 (캐시 히트 시 스킵)
+                elif kind == "on_chat_model_stream" and not cache_hit_detected:
                     node = event.get("metadata", {}).get("langgraph_node", "")
                     if node not in _STREAMABLE_NODES:
                         continue
@@ -147,10 +169,11 @@ async def chat_stream(request: ChatRequest):
 
                 # 노드 시작
                 elif kind == "on_chain_start" and event.get("name") in {
-                    "model_router", "intent_router",
+                    "model_router", "cache_lookup", "intent_router",
                     "troubleshoot_agent", "install_agent",
                     "connect_agent", "clinical_agent",
                     "placeholder_agent", "guardrail", "fix_response",
+                    "cache_store",
                 }:
                     payload = json.dumps(
                         {"type": "node_start", "node": event["name"]},
@@ -170,6 +193,7 @@ async def chat_stream(request: ChatRequest):
                     "support_level": final.get("support_level"),
                     "guardrail_passed": final.get("guardrail_passed"),
                     "disclaimer_included": final.get("needs_disclaimer", False),
+                    "cache_hit": final.get("cache_hit", False),
                 },
                 ensure_ascii=False,
             )

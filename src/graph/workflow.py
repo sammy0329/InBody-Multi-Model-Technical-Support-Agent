@@ -1,16 +1,18 @@
-"""LangGraph 워크플로우 정의 — T029, T045, T048, T052, T055, T057, T058, T062
+"""LangGraph 워크플로우 정의 — T029, T045, T048, T052, T055, T057, T058, T062, T118
 
 START → model_router → [조건부 엣지]
-                          ├── identified → intent_router → [조건부 엣지]
-                          │                                  ├── troubleshoot → troubleshoot_agent ─┐
-                          │                                  ├── install → install_agent ────────────┤
-                          │                                  ├── connect → connect_agent ────────────┤
-                          │                                  ├── clinical → clinical_agent ──────────┤
-                          │                                  └── 그 외 → placeholder_agent ──────────┤
-                          │                                                                         ▼
-                          │                                                                    guardrail
-                          │                                                                    ├── 통과 → END
-                          │                                                                    └── 실패 → fix_response → guardrail (최대 2회)
+                          ├── identified → cache_lookup → [조건부 엣지]
+                          │                                 ├── 히트 → END (캐시 응답)
+                          │                                 └── 미스 → intent_router → [조건부 엣지]
+                          │                                              ├── troubleshoot → troubleshoot_agent ─┐
+                          │                                              ├── install → install_agent ────────────┤
+                          │                                              ├── connect → connect_agent ────────────┤
+                          │                                              ├── clinical → clinical_agent ──────────┤
+                          │                                              └── 그 외 → placeholder_agent ──────────┤
+                          │                                                                                      ▼
+                          │                                                                                 guardrail
+                          │                                                                                 ├── 통과 → cache_store → END
+                          │                                                                                 └── 실패 → fix_response → guardrail (최대 2회)
                           └── unidentified/unsupported → END (answer 이미 설정됨)
 """
 
@@ -18,10 +20,12 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, StateGraph
 
 from src.graph.edges import (
+    route_after_cache_lookup,
     route_after_guardrail,
     route_after_intent_router,
     route_after_model_router,
 )
+from src.graph.nodes.cache_node import cache_lookup_node, cache_store_node
 from src.graph.nodes.clinical_agent import clinical_agent_node
 from src.graph.nodes.connect_agent import connect_agent_node
 from src.graph.nodes.guardrail import fix_response_node, guardrail_node
@@ -50,6 +54,7 @@ def create_workflow() -> StateGraph:
 
     # 노드 등록
     workflow.add_node("model_router", model_router_node)
+    workflow.add_node("cache_lookup", cache_lookup_node)
     workflow.add_node("intent_router", intent_router_node)
     workflow.add_node("placeholder_agent", placeholder_agent_node)
     workflow.add_node("troubleshoot_agent", troubleshoot_agent_node)
@@ -58,14 +63,23 @@ def create_workflow() -> StateGraph:
     workflow.add_node("clinical_agent", clinical_agent_node)
     workflow.add_node("guardrail", guardrail_node)
     workflow.add_node("fix_response", fix_response_node)
+    workflow.add_node("cache_store", cache_store_node)
 
     # 엣지 설정
     workflow.set_entry_point("model_router")
 
+    # ModelRouter → cache_lookup 또는 END
     workflow.add_conditional_edges(
         "model_router",
         route_after_model_router,
-        {"intent_router": "intent_router", "__end__": END},
+        {"cache_lookup": "cache_lookup", "__end__": END},
+    )
+
+    # cache_lookup → END (히트) 또는 intent_router (미스)
+    workflow.add_conditional_edges(
+        "cache_lookup",
+        route_after_cache_lookup,
+        {"__end__": END, "intent_router": "intent_router"},
     )
 
     workflow.add_conditional_edges(
@@ -87,12 +101,15 @@ def create_workflow() -> StateGraph:
     workflow.add_edge("clinical_agent", "guardrail")
     workflow.add_edge("placeholder_agent", "guardrail")
 
-    # guardrail → 조건부 엣지 (통과/실패)
+    # guardrail → 조건부 엣지 (통과 → cache_store, 실패 → fix_response)
     workflow.add_conditional_edges(
         "guardrail",
         route_after_guardrail,
-        {"__end__": END, "fix_response": "fix_response"},
+        {"cache_store": "cache_store", "fix_response": "fix_response"},
     )
+
+    # cache_store → END
+    workflow.add_edge("cache_store", END)
 
     # fix_response → guardrail (재검증 루프)
     workflow.add_edge("fix_response", "guardrail")
