@@ -54,6 +54,14 @@ async def guardrail_node(state: AgentState) -> dict:
             "guardrail_suggestion": None,
         }
 
+    # 미등록 에러 코드 고정 응답은 가드레일 검사 건너뜀 (할루시네이션 방지 응답)
+    if "등록되지 않은 코드입니다" in answer:
+        return {
+            "guardrail_passed": True,
+            "guardrail_violations": [],
+            "guardrail_suggestion": None,
+        }
+
     violations: list[str] = []
     hard_fail = False
 
