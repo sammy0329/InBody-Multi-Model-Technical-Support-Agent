@@ -175,8 +175,16 @@ async def chat_stream(request: ChatRequest):
                     "placeholder_agent", "guardrail", "fix_response",
                     "cache_store",
                 }:
+                    node_name = event["name"]
+                    # fix_response 진입 시 UI에 이전 스트리밍 내용 초기화 요청
+                    if node_name == "fix_response":
+                        clear_payload = json.dumps(
+                            {"type": "clear"},
+                            ensure_ascii=False,
+                        )
+                        yield f"data: {clear_payload}\n\n"
                     payload = json.dumps(
-                        {"type": "node_start", "node": event["name"]},
+                        {"type": "node_start", "node": node_name},
                         ensure_ascii=False,
                     )
                     yield f"data: {payload}\n\n"

@@ -162,6 +162,11 @@ if user_input:
                     label = NODE_LABELS.get(node, f"{node} 처리 중...")
                     status_container.update(label=label, state="running")
 
+                elif event_type == "clear":
+                    # 가드레일 위반 → fix_response 재생성 시 이전 스트리밍 초기화
+                    full_response = ""
+                    response_placeholder.empty()
+
                 elif event_type == "token":
                     full_response += event.get("content", "")
                     response_placeholder.markdown(full_response + "\u258c")
