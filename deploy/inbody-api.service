@@ -6,7 +6,6 @@ After=network.target
 Type=simple
 User=ubuntu
 WorkingDirectory=/home/ubuntu/InBody-Multi-Model-Technical-Support-Agent
-EnvironmentFile=/home/ubuntu/InBody-Multi-Model-Technical-Support-Agent/.env
 Environment=PYTHONPATH=/home/ubuntu/InBody-Multi-Model-Technical-Support-Agent
 Environment=PYTHONUNBUFFERED=1
 ExecStart=/home/ubuntu/InBody-Multi-Model-Technical-Support-Agent/.venv/bin/uvicorn src.main:app --host 0.0.0.0 --port 8000
