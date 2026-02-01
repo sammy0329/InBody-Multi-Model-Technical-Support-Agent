@@ -1,0 +1,17 @@
+[Unit]
+Description=InBody Tech-Master Streamlit UI
+After=network.target inbody-api.service
+Requires=inbody-api.service
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/inbody-app
+Environment=PYTHONPATH=/home/ubuntu/inbody-app
+Environment=API_BASE_URL=http://localhost:8000/api/v1
+ExecStart=/home/ubuntu/inbody-app/.venv/bin/streamlit run ui/app.py --server.port=8501 --server.address=0.0.0.0 --server.headless=true --browser.gatherUsageStats=false
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
