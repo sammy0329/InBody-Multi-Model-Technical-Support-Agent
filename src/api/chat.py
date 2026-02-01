@@ -1,5 +1,6 @@
 """채팅 API 엔드포인트 — T038, T059, T062, T063, T121"""
 
+import asyncio
 import json
 import logging
 
@@ -146,13 +147,17 @@ async def chat_stream(request: ChatRequest):
                     output = event.get("data", {}).get("output", {})
                     if output.get("cache_hit"):
                         cache_hit_detected = True
-                        # 캐시 히트: 전체 응답을 단일 토큰 이벤트로 즉시 전송
+                        # 캐시 히트: 청크 단위로 나눠 타이핑 효과 스트리밍
                         cached_response = output.get("answer", "")
-                        payload = json.dumps(
-                            {"type": "token", "content": cached_response},
-                            ensure_ascii=False,
-                        )
-                        yield f"data: {payload}\n\n"
+                        chunk_size = 4
+                        for i in range(0, len(cached_response), chunk_size):
+                            chunk = cached_response[i:i + chunk_size]
+                            payload = json.dumps(
+                                {"type": "token", "content": chunk},
+                                ensure_ascii=False,
+                            )
+                            yield f"data: {payload}\n\n"
+                            await asyncio.sleep(0.02)
 
                 # LLM 토큰 스트리밍 — 에이전트 노드만 필터 (캐시 히트 시 스킵)
                 elif kind == "on_chat_model_stream" and not cache_hit_detected:
