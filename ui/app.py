@@ -23,6 +23,12 @@ if "last_sent_model" not in st.session_state:
 # ── 사이드바 렌더링 ──
 selected_model = render_sidebar()
 
+# ── '선택 안 함' 전환 시 세션 리셋 ──
+if selected_model is None and st.session_state["last_sent_model"] is not None:
+    st.session_state["thread_id"] = generate_thread_id()
+    st.session_state["messages"] = []
+    st.session_state["last_sent_model"] = None
+
 # ── 기종 선택 버튼 (T087) ──
 MODEL_CHOICES = [
     ("InBody 270S", "270S"),
@@ -204,6 +210,14 @@ if user_input:
             # T087: 기종 선택 필요 시 버튼 즉시 표시
             if metadata.get("needs_model_selection"):
                 _render_model_buttons()
+            elif metadata.get("identified_model") or metadata.get("intent"):
+                with st.expander("응답 정보", expanded=False):
+                    if metadata.get("identified_model"):
+                        st.caption(f"기종: {metadata['identified_model']}")
+                    if metadata.get("intent"):
+                        st.caption(f"의도: {metadata['intent']}")
+                    if metadata.get("support_level"):
+                        st.caption(f"지원 수준: {metadata['support_level']}")
 
         except Exception as e:
             st.warning(f"스트리밍 연결 실패: {e}")
