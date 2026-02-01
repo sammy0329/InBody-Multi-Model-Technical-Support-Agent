@@ -43,6 +43,17 @@ asyncio_mode = "auto"
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
+markers = [
+    "unit: Deterministic unit tests (no LLM, no API key)",
+    "contract: API contract tests",
+    "evaluation: SC metrics evaluation tests",
+    "sc001: SC-001 model identification accuracy",
+    "sc003: SC-003 error code resolution accuracy",
+    "sc004: SC-004 medical disclaimer inclusion",
+    "sc005: SC-005 cross-model information isolation",
+    "sc006: SC-006 Level 3 safety enforcement",
+    "sc009: SC-009 hallucination prevention",
+]
 
 [tool.ruff]
 target-version = "py311"
