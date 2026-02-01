@@ -2,14 +2,76 @@
   {
     "model_id": "270S",
     "peripheral_type": "printer",
-    "peripheral_name": "InBody 전용 감열식 프린터",
+    "peripheral_name": "삼성 SL-M2035",
     "is_compatible": true,
     "connection_method": "USB",
+    "notes": null,
     "setup_steps": [
-      "프린터를 InBody 270S의 USB 포트에 연결하세요.",
+      "프린터 케이블을 InBody 270S의 USB 포트에 연결하세요.",
       "프린터 전원을 켜세요.",
-      "기기 설정에서 '프린터 연결 확인'을 실행하세요.",
-      "테스트 인쇄를 실행하여 정상 동작을 확인하세요."
+      "관리자 메뉴 > 09. 프린터 연결을 클릭하세요.",
+      "프린터 연결 O 클릭 > 시범인쇄를 클릭하세요.",
+      "정상 출력되는 결과지 샘플의 우측 상단 프린터 통신언어를 인바디에서 선택하세요."
+    ]
+  },
+  {
+    "model_id": "270S",
+    "peripheral_type": "printer",
+    "peripheral_name": "렉스마크 MS312DN",
+    "is_compatible": true,
+    "connection_method": "USB",
+    "notes": null,
+    "setup_steps": [
+      "프린터 케이블을 InBody 270S의 USB 포트에 연결하세요.",
+      "프린터 전원을 켜세요.",
+      "관리자 메뉴 > 09. 프린터 연결을 클릭하세요.",
+      "프린터 연결 O 클릭 > 시범인쇄를 클릭하세요.",
+      "정상 출력되는 결과지 샘플의 우측 상단 프린터 통신언어를 인바디에서 선택하세요."
+    ]
+  },
+  {
+    "model_id": "270S",
+    "peripheral_type": "printer",
+    "peripheral_name": "삼성 SL-M2027W",
+    "is_compatible": true,
+    "connection_method": "USB / Wi-Fi",
+    "notes": "270DM-0401 버전 이상에서 호환. 무선 연결 가능 (인바디와 프린터가 동일 Wi-Fi에 연결되어야 함).",
+    "setup_steps": [
+      "프린터 케이블을 InBody 270S의 USB 포트에 연결하세요. (무선 시 Wi-Fi 설정 먼저 진행)",
+      "무선 연결 시 인바디와 프린터를 동일한 Wi-Fi에 연결하세요.",
+      "관리자 메뉴 > 09. 프린터 연결을 클릭하세요.",
+      "프린터 연결 O 클릭 > 시범인쇄를 클릭하세요.",
+      "정상 출력되는 결과지 샘플의 우측 상단 프린터 통신언어를 인바디에서 선택하세요."
+    ]
+  },
+  {
+    "model_id": "270S",
+    "peripheral_type": "printer",
+    "peripheral_name": "삼성 SL-C563FW",
+    "is_compatible": true,
+    "connection_method": "USB",
+    "notes": "270DM-0422 버전 이상에서 호환.",
+    "setup_steps": [
+      "프린터 케이블을 InBody 270S의 USB 포트에 연결하세요.",
+      "프린터 전원을 켜세요.",
+      "관리자 메뉴 > 09. 프린터 연결을 클릭하세요.",
+      "프린터 연결 O 클릭 > 시범인쇄를 클릭하세요.",
+      "정상 출력되는 결과지 샘플의 우측 상단 프린터 통신언어를 인바디에서 선택하세요."
+    ]
+  },
+  {
+    "model_id": "270S",
+    "peripheral_type": "printer",
+    "peripheral_name": "HP 레이저젯 프로 M203DW",
+    "is_compatible": true,
+    "connection_method": "USB",
+    "notes": "270DM-0390 버전 이상에서 호환.",
+    "setup_steps": [
+      "프린터 케이블을 InBody 270S의 USB 포트에 연결하세요.",
+      "프린터 전원을 켜세요.",
+      "관리자 메뉴 > 09. 프린터 연결을 클릭하세요.",
+      "프린터 연결 O 클릭 > 시범인쇄를 클릭하세요.",
+      "정상 출력되는 결과지 샘플의 우측 상단 프린터 통신언어를 인바디에서 선택하세요."
     ]
   },
   {
@@ -18,6 +80,7 @@
     "peripheral_name": "Lookin'Body 120",
     "is_compatible": true,
     "connection_method": "USB",
+    "notes": null,
     "setup_steps": [
       "PC에 Lookin'Body 120 소프트웨어를 설치하세요.",
       "USB 케이블로 InBody 270S와 PC를 연결하세요.",
@@ -31,6 +94,7 @@
     "peripheral_name": "USB 바코드 리더기 (HID 호환)",
     "is_compatible": true,
     "connection_method": "USB HID",
+    "notes": null,
     "setup_steps": [
       "바코드 리더기를 InBody 270S의 USB 포트에 연결하세요.",
       "기기가 자동으로 HID 장치를 인식합니다.",
@@ -40,14 +104,17 @@
   {
     "model_id": "580",
     "peripheral_type": "printer",
-    "peripheral_name": "InBody 전용 감열식 프린터",
+    "peripheral_name": "PCL3 이상 / SPL 호환 Laser·Inkjet 프린터",
     "is_compatible": true,
-    "connection_method": "USB",
+    "connection_method": "USB / Wi-Fi",
+    "notes": "InBody 580은 PCL3 이상 또는 SPL 통신언어를 지원하는 레이저/잉크젯 프린터와 호환됩니다. 프린터 찾기 기능으로 자동 감지됩니다.",
     "setup_steps": [
-      "프린터를 InBody 580의 USB 포트에 연결하세요.",
-      "프린터 전원을 켜세요.",
-      "설정 > 프린터에서 연결 상태를 확인하세요.",
-      "테스트 인쇄를 실행하세요."
+      "프린터를 InBody 580의 USB 포트에 연결하세요. (무선 시 동일 Wi-Fi 연결 필요)",
+      "관리자모드 > 5. 프린터 및 인쇄 설정 > 프린터 연결 선택 > 사용중으로 변경하세요.",
+      "프린터 찾기를 선택하세요.",
+      "연결된 프린터 모델명을 확인하고 선택하세요.",
+      "모델명이 확인되지 않으면 '원하는 프린터가 없습니다'를 선택 후 통신언어 또는 프린터 드라이버로 연결을 시도하세요.",
+      "시범인쇄를 실행하여 정상 동작을 확인하세요."
     ]
   },
   {
@@ -56,6 +123,7 @@
     "peripheral_name": "Lookin'Body 120",
     "is_compatible": true,
     "connection_method": "USB / LAN",
+    "notes": null,
     "setup_steps": [
       "PC에 Lookin'Body 120 소프트웨어를 설치하세요.",
       "USB 또는 LAN 케이블로 InBody 580과 PC를 연결하세요.",
@@ -69,6 +137,7 @@
     "peripheral_name": "USB 바코드 리더기 (HID 호환)",
     "is_compatible": true,
     "connection_method": "USB HID",
+    "notes": null,
     "setup_steps": [
       "바코드 리더기를 InBody 580의 USB 포트에 연결하세요.",
       "기기가 자동으로 인식합니다.",
@@ -81,6 +150,7 @@
     "peripheral_name": "USB 메모리 (FAT32)",
     "is_compatible": true,
     "connection_method": "USB",
+    "notes": null,
     "setup_steps": [
       "FAT32로 포맷된 USB 메모리를 준비하세요.",
       "InBody 580의 USB 포트에 삽입하세요.",
@@ -90,14 +160,61 @@
   {
     "model_id": "770S",
     "peripheral_type": "printer",
-    "peripheral_name": "InBody 전용 감열식 프린터",
+    "peripheral_name": "삼성 SL-M2035",
     "is_compatible": true,
     "connection_method": "USB",
+    "notes": null,
     "setup_steps": [
-      "프린터를 InBody 770S의 USB 포트에 연결하세요.",
+      "프린터 케이블을 InBody 770S의 USB 포트에 연결하세요.",
       "프린터 전원을 켜세요.",
-      "설정 메뉴에서 프린터 유형을 선택하세요 (일반/상세 결과지).",
-      "테스트 인쇄를 실행하세요."
+      "관리자 메뉴 > 09. 프린터 연결을 클릭하세요.",
+      "프린터 연결 O 클릭 > 시범인쇄를 클릭하세요.",
+      "정상 출력되는 결과지 샘플의 우측 상단 프린터 통신언어를 인바디에서 선택하세요."
+    ]
+  },
+  {
+    "model_id": "770S",
+    "peripheral_type": "printer",
+    "peripheral_name": "렉스마크 MS312DN",
+    "is_compatible": true,
+    "connection_method": "USB",
+    "notes": null,
+    "setup_steps": [
+      "프린터 케이블을 InBody 770S의 USB 포트에 연결하세요.",
+      "프린터 전원을 켜세요.",
+      "관리자 메뉴 > 09. 프린터 연결을 클릭하세요.",
+      "프린터 연결 O 클릭 > 시범인쇄를 클릭하세요.",
+      "정상 출력되는 결과지 샘플의 우측 상단 프린터 통신언어를 인바디에서 선택하세요."
+    ]
+  },
+  {
+    "model_id": "770S",
+    "peripheral_type": "printer",
+    "peripheral_name": "삼성 SL-M2027W",
+    "is_compatible": true,
+    "connection_method": "USB / Wi-Fi",
+    "notes": "770DM-0401 버전 이상에서 호환. 무선 연결 가능 (인바디와 프린터가 동일 Wi-Fi에 연결되어야 함).",
+    "setup_steps": [
+      "프린터 케이블을 InBody 770S의 USB 포트에 연결하세요. (무선 시 Wi-Fi 설정 먼저 진행)",
+      "무선 연결 시 인바디와 프린터를 동일한 Wi-Fi에 연결하세요.",
+      "관리자 메뉴 > 09. 프린터 연결을 클릭하세요.",
+      "프린터 연결 O 클릭 > 시범인쇄를 클릭하세요.",
+      "정상 출력되는 결과지 샘플의 우측 상단 프린터 통신언어를 인바디에서 선택하세요."
+    ]
+  },
+  {
+    "model_id": "770S",
+    "peripheral_type": "printer",
+    "peripheral_name": "HP 레이저젯 프로 M203DW",
+    "is_compatible": true,
+    "connection_method": "USB",
+    "notes": "770DM-0390 버전 이상에서 호환.",
+    "setup_steps": [
+      "프린터 케이블을 InBody 770S의 USB 포트에 연결하세요.",
+      "프린터 전원을 켜세요.",
+      "관리자 메뉴 > 09. 프린터 연결을 클릭하세요.",
+      "프린터 연결 O 클릭 > 시범인쇄를 클릭하세요.",
+      "정상 출력되는 결과지 샘플의 우측 상단 프린터 통신언어를 인바디에서 선택하세요."
     ]
   },
   {
@@ -106,6 +223,7 @@
     "peripheral_name": "Lookin'Body 120",
     "is_compatible": true,
     "connection_method": "USB / LAN / RS-232C",
+    "notes": null,
     "setup_steps": [
       "PC에 Lookin'Body 120 소프트웨어를 설치하세요.",
       "원하는 연결 방식(USB/LAN/RS-232C)으로 기기와 PC를 연결하세요.",
@@ -119,6 +237,7 @@
     "peripheral_name": "USB 바코드 리더기 (HID 호환)",
     "is_compatible": true,
     "connection_method": "USB HID",
+    "notes": null,
     "setup_steps": [
       "바코드 리더기를 InBody 770S의 USB 포트에 연결하세요.",
       "기기가 자동으로 HID 장치를 인식합니다.",
@@ -131,6 +250,7 @@
     "peripheral_name": "병원 EMR/HIS 시스템",
     "is_compatible": true,
     "connection_method": "LAN (HL7/DICOM)",
+    "notes": null,
     "setup_steps": [
       "병원 IT 부서에 InBody 연동 프로토콜(HL7) 정보를 전달하세요.",
       "InBody 770S 네트워크 설정에서 EMR 서버 IP와 포트를 설정하세요.",
@@ -141,14 +261,61 @@
   {
     "model_id": "970S",
     "peripheral_type": "printer",
-    "peripheral_name": "InBody 전용 감열식 프린터",
+    "peripheral_name": "삼성 SL-M2035",
     "is_compatible": true,
     "connection_method": "USB",
+    "notes": null,
     "setup_steps": [
-      "프린터를 InBody 970S의 USB 포트에 연결하세요.",
+      "프린터 케이블을 InBody 970S의 USB 포트에 연결하세요.",
       "프린터 전원을 켜세요.",
-      "설정에서 결과지 유형을 선택하세요 (임상용/연구용/간편).",
-      "테스트 인쇄를 실행하세요."
+      "관리자 메뉴 > 09. 프린터 연결을 클릭하세요.",
+      "프린터 연결 O 클릭 > 시범인쇄를 클릭하세요.",
+      "정상 출력되는 결과지 샘플의 우측 상단 프린터 통신언어를 인바디에서 선택하세요."
+    ]
+  },
+  {
+    "model_id": "970S",
+    "peripheral_type": "printer",
+    "peripheral_name": "렉스마크 MS312DN",
+    "is_compatible": true,
+    "connection_method": "USB",
+    "notes": null,
+    "setup_steps": [
+      "프린터 케이블을 InBody 970S의 USB 포트에 연결하세요.",
+      "프린터 전원을 켜세요.",
+      "관리자 메뉴 > 09. 프린터 연결을 클릭하세요.",
+      "프린터 연결 O 클릭 > 시범인쇄를 클릭하세요.",
+      "정상 출력되는 결과지 샘플의 우측 상단 프린터 통신언어를 인바디에서 선택하세요."
+    ]
+  },
+  {
+    "model_id": "970S",
+    "peripheral_type": "printer",
+    "peripheral_name": "삼성 SL-M2027W",
+    "is_compatible": true,
+    "connection_method": "USB / Wi-Fi",
+    "notes": "970DM-0410 버전 이상에서 호환. 무선 연결 가능 (인바디와 프린터가 동일 Wi-Fi에 연결되어야 함).",
+    "setup_steps": [
+      "프린터 케이블을 InBody 970S의 USB 포트에 연결하세요. (무선 시 Wi-Fi 설정 먼저 진행)",
+      "무선 연결 시 인바디와 프린터를 동일한 Wi-Fi에 연결하세요.",
+      "관리자 메뉴 > 09. 프린터 연결을 클릭하세요.",
+      "프린터 연결 O 클릭 > 시범인쇄를 클릭하세요.",
+      "정상 출력되는 결과지 샘플의 우측 상단 프린터 통신언어를 인바디에서 선택하세요."
+    ]
+  },
+  {
+    "model_id": "970S",
+    "peripheral_type": "printer",
+    "peripheral_name": "HP 레이저젯 프로 M203DW",
+    "is_compatible": true,
+    "connection_method": "USB",
+    "notes": "970DM-0390 버전 이상에서 호환.",
+    "setup_steps": [
+      "프린터 케이블을 InBody 970S의 USB 포트에 연결하세요.",
+      "프린터 전원을 켜세요.",
+      "관리자 메뉴 > 09. 프린터 연결을 클릭하세요.",
+      "프린터 연결 O 클릭 > 시범인쇄를 클릭하세요.",
+      "정상 출력되는 결과지 샘플의 우측 상단 프린터 통신언어를 인바디에서 선택하세요."
     ]
   },
   {
@@ -157,6 +324,7 @@
     "peripheral_name": "Lookin'Body 120",
     "is_compatible": true,
     "connection_method": "USB / LAN / RS-232C",
+    "notes": null,
     "setup_steps": [
       "PC에 Lookin'Body 120 소프트웨어를 설치하세요.",
       "원하는 연결 방식으로 기기와 PC를 연결하세요.",
@@ -170,6 +338,7 @@
     "peripheral_name": "USB 바코드 리더기 (HID 호환)",
     "is_compatible": true,
     "connection_method": "USB HID",
+    "notes": null,
     "setup_steps": [
       "바코드 리더기를 InBody 970S의 USB 포트에 연결하세요.",
       "기기가 자동으로 HID 장치를 인식합니다.",
@@ -182,6 +351,7 @@
     "peripheral_name": "병원 EMR/HIS 시스템",
     "is_compatible": true,
     "connection_method": "LAN (HL7/DICOM)",
+    "notes": null,
     "setup_steps": [
       "병원 IT 부서에 InBody 연동 프로토콜(HL7/DICOM) 정보를 전달하세요.",
       "InBody 970S 네트워크 설정에서 EMR 서버 정보를 구성하세요.",

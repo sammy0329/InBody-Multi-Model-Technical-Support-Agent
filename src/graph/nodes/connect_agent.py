@@ -14,6 +14,7 @@ from src.models.inbody_models import get_model_profile
 from src.models.state import AgentState
 from src.prompts.system_prompts import CONNECT_AGENT_PROMPT
 from src.prompts.tone_profiles import get_tone_instruction
+from src.rag.section_map import get_adjacent_sections
 from src.tools.manual_search_tool import extract_image_urls, search_manual
 from src.tools.peripheral_tool import check_peripheral_compatibility
 
@@ -87,11 +88,16 @@ async def connect_agent_node(state: AgentState) -> dict:
             "비호환 사유를 명확히 설명하고, 호환되는 대안을 제시하세요."
         )
 
+    # 인접 섹션 정보 추가
+    section_hint = get_adjacent_sections(model_id, user_message)
+    if section_hint:
+        context_parts.append(f"[관련 섹션 안내]\n{section_hint}")
+
     context = "\n\n".join(context_parts)
 
-    # Step 4: GPT-4o로 응답 생성
+    # Step 4: GPT-4o-mini로 응답 생성
     llm = ChatOpenAI(
-        model=settings.openai_model,
+        model=settings.openai_mini_model,
         api_key=settings.openai_api_key,
         temperature=0.3,
     )

@@ -36,4 +36,5 @@ class PeripheralCompatibilityTable(Base):
     peripheral_name = Column(String, nullable=False)
     is_compatible = Column(Boolean, nullable=False, default=True)
     connection_method = Column(String, nullable=True)
+    notes = Column(String, nullable=True)
     setup_steps = Column(JSON, nullable=False)  # list[str]

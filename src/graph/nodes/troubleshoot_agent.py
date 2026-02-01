@@ -16,6 +16,7 @@ from src.models.state import AgentState
 from src.prompts.disclaimers import HARDWARE_DISCLAIMER, SERVICE_CENTER_INFO
 from src.prompts.system_prompts import TROUBLESHOOT_AGENT_PROMPT
 from src.prompts.tone_profiles import get_tone_instruction
+from src.rag.section_map import get_adjacent_sections
 from src.tools.error_code_tool import lookup_error_code, search_errors_by_symptom
 from src.tools.manual_search_tool import extract_image_urls, search_manual
 
@@ -91,11 +92,16 @@ async def troubleshoot_agent_node(state: AgentState) -> dict:
             "서비스 센터(Level 3) 이관을 안내하세요."
         )
 
+    # 인접 섹션 정보 추가
+    section_hint = get_adjacent_sections(model_id, user_message)
+    if section_hint:
+        context_parts.append(f"[관련 섹션 안내]\n{section_hint}")
+
     context = "\n\n".join(context_parts)
 
-    # Step 3: GPT-4o로 응답 생성
+    # Step 3: GPT-4o-mini로 응답 생성
     llm = ChatOpenAI(
-        model=settings.openai_model,
+        model=settings.openai_mini_model,
         api_key=settings.openai_api_key,
         temperature=0.3,
     )

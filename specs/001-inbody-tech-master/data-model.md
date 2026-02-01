@@ -149,6 +149,26 @@ ConversationSession
 └── message_count: 총 메시지 수
 ```
 
+## 7. SectionMap (매뉴얼 섹션 맵)
+
+기종별 매뉴얼의 목차 구조를 JSON으로 정의한다. 후속 질문 제안 시 인접 섹션 정보를 제공하는 데 사용된다.
+
+```
+SectionMap (JSON 파일: data/section_maps/{model_id}.json)
+├── chapters: 장(대분류) 목록
+│   ├── id: 장 식별자 (예: "I", "1")
+│   ├── title: 장 제목 (예: "제품 소개")
+│   └── sections: 절(소분류) 목록
+│       ├── id: 절 식별자 (예: "I-A", "4.1")
+│       ├── title: 절 제목 (예: "초기 설정하기")
+│       └── keywords: 매칭 키워드 배열 (예: ["초기", "설정", "전원"])
+```
+
+**유효성 규칙**:
+- 각 기종(270S, 580, 770S, 970S)에 대해 하나의 JSON 파일이 존재해야 한다
+- `keywords`는 최소 2개 이상 포함해야 한다
+- 270S/770S/970S는 로마 숫자 장 번호(I, II, III), 580은 아라비아 숫자 장 번호(1, 2, 3)를 사용한다
+
 ## 엔티티 관계
 
 ```
@@ -156,6 +176,7 @@ ConversationSession  1 --- 1  AgentState (체크포인터로 연결)
 InBodyModel          1 --- *  ErrorCode
 InBodyModel          1 --- *  PeripheralCompatibility
 InBodyModel          1 --- *  ManualChunk (metadata.model로 연결)
+InBodyModel          1 --- 1  SectionMap (model_id로 연결)
 AgentState           * --- *  ManualChunk (retrieved_docs로 참조)
 ```
 
@@ -169,3 +190,4 @@ AgentState           * --- *  ManualChunk (retrieved_docs로 참조)
 | PeripheralCompatibility | SQLite (개발) / PostgreSQL (프로덕션) | Tool Calling |
 | ManualChunk | Chroma (개발) / Pinecone (프로덕션) | RAG 벡터 검색 |
 | ConversationSession | LangGraph 체크포인터 | thread_id 기반 관리 |
+| SectionMap | JSON 파일 (data/section_maps/) | lru_cache로 로드, 키워드 매칭 |

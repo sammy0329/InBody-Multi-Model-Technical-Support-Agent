@@ -120,13 +120,23 @@ async def chat_stream(request: ChatRequest):
 
             config = {"configurable": {"thread_id": request.thread_id}}
 
+            # 사용자에게 토큰을 스트리밍할 노드 (라우터/가드레일 제외)
+            _STREAMABLE_NODES = {
+                "install_agent", "connect_agent",
+                "troubleshoot_agent", "clinical_agent",
+                "placeholder_agent", "fix_response",
+            }
+
             async for event in workflow.astream_events(
                 initial_state, config=config, version="v2"
             ):
                 kind = event.get("event")
 
-                # LLM 토큰 스트리밍
+                # LLM 토큰 스트리밍 — 에이전트 노드만 필터
                 if kind == "on_chat_model_stream":
+                    node = event.get("metadata", {}).get("langgraph_node", "")
+                    if node not in _STREAMABLE_NODES:
+                        continue
                     chunk = event.get("data", {}).get("chunk")
                     if chunk and hasattr(chunk, "content") and chunk.content:
                         payload = json.dumps(

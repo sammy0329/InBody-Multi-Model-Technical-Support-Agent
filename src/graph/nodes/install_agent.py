@@ -14,6 +14,7 @@ from src.models.inbody_models import get_model_profile
 from src.models.state import AgentState
 from src.prompts.system_prompts import INSTALL_AGENT_PROMPT
 from src.prompts.tone_profiles import get_tone_instruction
+from src.rag.section_map import get_adjacent_sections
 from src.tools.manual_search_tool import extract_image_urls, search_manual
 
 logger = logging.getLogger(__name__)
@@ -77,11 +78,16 @@ async def install_agent_node(state: AgentState) -> dict:
             "- 그래도 해결되지 않을 경우 서비스 센터 연락 안내"
         )
 
+    # 인접 섹션 정보 추가
+    section_hint = get_adjacent_sections(model_id, user_message)
+    if section_hint:
+        context_parts.append(f"[관련 섹션 안내]\n{section_hint}")
+
     context = "\n\n".join(context_parts)
 
-    # Step 3: GPT-4o로 응답 생성
+    # Step 3: GPT-4o-mini로 응답 생성
     llm = ChatOpenAI(
-        model=settings.openai_model,
+        model=settings.openai_mini_model,
         api_key=settings.openai_api_key,
         temperature=0.3,
     )

@@ -10,7 +10,7 @@ InBody 기종(270S, 580, 770S, 970S) 식별 기반 멀티 에이전트 기술 �
 ## 기술 컨텍스트
 
 **Language/Version**: Python 3.11+
-**Primary Dependencies**: FastAPI, LangChain, LangGraph, OpenAI API (GPT-4o / GPT-4o-mini), Streamlit
+**Primary Dependencies**: FastAPI, LangChain, LangGraph, OpenAI API (GPT-4o-mini — 전 에이전트 통일), Streamlit
 **Storage**: Chroma (개발) / Pinecone (프로덕션) — 벡터 DB, SQLite (개발) / PostgreSQL (프로덕션) — 구조화 DB
 **Testing**: pytest, pytest-asyncio, httpx
 **Target Platform**: AWS EC2 Spot (t3.small) — Docker Compose
@@ -80,7 +80,8 @@ src/
 ├── rag/
 │   ├── vectorstore.py           # Vector DB 초기화 및 리트리버 팩토리
 │   ├── ingest.py                # PDF 매뉴얼 인제스트 (청킹 + 임베딩)
-│   └── metadata.py              # 메타데이터 태깅 및 필터 유틸리티
+│   ├── metadata.py              # 메타데이터 태깅 및 필터 유틸리티
+│   └── section_map.py           # 매뉴얼 섹션 맵 유틸리티 (인접 섹션 탐색)
 ├── prompts/
 │   ├── system_prompts.py        # 에이전트별 시스템 프롬프트 템플릿
 │   ├── tone_profiles.py         # 톤앤매너 프로파일 (casual / professional)
@@ -115,6 +116,11 @@ data/
 ├── seed/                        # 시드 데이터 (JSON/CSV)
 │   ├── error_codes.json
 │   └── peripheral_compatibility.json
+├── section_maps/                # 기종별 매뉴얼 목차 구조 (JSON)
+│   ├── 270S.json
+│   ├── 580.json
+│   ├── 770S.json
+│   └── 970S.json
 └── chroma/                      # Chroma 영속 저장소 (개발용)
 
 tests/
@@ -207,8 +213,11 @@ Layer 3: 후처리 검증
 **주요 기능**:
 - `st.chat_message`/`st.chat_input`으로 대화형 채팅 UI
 - 사이드바: 기종 직접 선택, 세션 초기화
-- `st.write_stream`으로 SSE 스트리밍 응답 실시간 표시
+- `st.empty()` + 점진적 markdown 갱신으로 SSE 스트리밍 응답 실시간 표시
+- SSE 토큰 필터링: 에이전트 노드 응답만 스트리밍, 내부 노드(라우터/가드레일) 출력 차단
+- 웰컴 화면: 카테고리별(설치/연동/트러블슈팅/측정결과) 예시 질문 버튼
 - 세션 상태(`st.session_state`)로 thread_id 관리
+- 섹션 기반 후속 질문: 매뉴얼 목차 구조를 활용한 맥락 있는 다음 질문 제안
 
 ## 배포 아키텍처 (AWS EC2 Spot)
 
