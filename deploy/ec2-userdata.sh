@@ -1,59 +1,56 @@
 #!/bin/bash
-# T075: EC2 초기 설정 스크립트
+# EC2 초기 설정 스크립트 (venv + systemd 방식)
 # Amazon Linux 2023 / Ubuntu 22.04 호환
 
 set -euo pipefail
 
-# ── 1. Docker 설치 ──
-if ! command -v docker &>/dev/null; then
-    if [ -f /etc/amazon-linux-release ]; then
-        yum update -y
-        yum install -y docker git
-        systemctl enable docker
-        systemctl start docker
-    else
-        apt-get update -y
-        apt-get install -y docker.io docker-compose-plugin git
-        systemctl enable docker
-        systemctl start docker
-    fi
+# ── 1. Python 3.11 + git 설치 ──
+if [ -f /etc/amazon-linux-release ]; then
+    yum update -y
+    yum install -y python3.11 python3.11-pip python3.11-devel git gcc
+else
+    apt-get update -y
+    apt-get install -y python3.11 python3.11-venv python3-pip git build-essential
 fi
 
-# ── 2. Docker Compose 설치 (standalone) ──
-if ! command -v docker-compose &>/dev/null && ! docker compose version &>/dev/null 2>&1; then
-    COMPOSE_VERSION="v2.24.0"
-    mkdir -p /usr/local/lib/docker/cli-plugins
-    curl -SL "https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-linux-$(uname -m)" \
-        -o /usr/local/lib/docker/cli-plugins/docker-compose
-    chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
-fi
-
-# ── 3. 사용자를 docker 그룹에 추가 ──
-usermod -aG docker ec2-user 2>/dev/null || usermod -aG docker ubuntu 2>/dev/null || true
-
-# ── 4. 프로젝트 클론 ──
-PROJECT_DIR="/home/ec2-user/inbody-app"
+# ── 2. 프로젝트 클론 ──
+PROJECT_DIR="/home/ubuntu/inbody-app"
 if [ ! -d "$PROJECT_DIR" ]; then
     git clone https://github.com/sammy0329/InBody-Multi-Model-Technical-Support-Agent.git "$PROJECT_DIR"
+    chown -R ubuntu:ubuntu "$PROJECT_DIR"
 fi
 
 cd "$PROJECT_DIR"
 git pull origin main 2>/dev/null || true
 
-# ── 5. 데이터 디렉토리 준비 ──
+# ── 3. 데이터 디렉토리 준비 ──
 mkdir -p data/chroma data/manuals static/images
 
-# ── 6. Docker Compose 빌드 및 실행 ──
-docker compose build
-docker compose up -d
-
-# ── 7. 초기 데이터 시딩 (최초 1회) ──
-SEED_FLAG="/home/ec2-user/.inbody-seeded"
-if [ ! -f "$SEED_FLAG" ]; then
-    sleep 10  # 서비스 안정화 대기
-    docker compose exec -T api python scripts/seed_structured_data.py 2>/dev/null || true
-    docker compose exec -T api python scripts/ingest_manuals.py 2>/dev/null || true
-    touch "$SEED_FLAG"
+# ── 4. venv 생성 및 의존성 설치 ──
+if [ ! -d "$PROJECT_DIR/.venv" ]; then
+    python3.11 -m venv "$PROJECT_DIR/.venv"
+    "$PROJECT_DIR/.venv/bin/pip" install --upgrade pip
+    "$PROJECT_DIR/.venv/bin/pip" install .
 fi
 
+# ── 5. systemd 서비스 등록 ──
+cp "$PROJECT_DIR/deploy/inbody-api.service" /etc/systemd/system/
+cp "$PROJECT_DIR/deploy/inbody-ui.service" /etc/systemd/system/
+systemctl daemon-reload
+systemctl enable inbody-api inbody-ui
+
+# ── 6. .env 확인 후 서비스 시작 ──
+if [ -f "$PROJECT_DIR/.env" ]; then
+    systemctl start inbody-api inbody-ui
+    echo "InBody Tech-Master 서비스가 시작되었습니다."
+else
+    echo "[WARNING] .env 파일이 없습니다. 아래 파일들을 SCP로 복사 후 서비스를 시작하세요:"
+    echo "  scp .env ubuntu@<EC2_IP>:~/inbody-app/.env"
+    echo "  scp -r data/chroma/ ubuntu@<EC2_IP>:~/inbody-app/data/chroma/"
+    echo "  scp data/inbody.db ubuntu@<EC2_IP>:~/inbody-app/data/inbody.db"
+    echo ""
+    echo "복사 후: sudo systemctl start inbody-api inbody-ui"
+fi
+
+chown -R ubuntu:ubuntu "$PROJECT_DIR"
 echo "InBody Tech-Master deployment complete."
