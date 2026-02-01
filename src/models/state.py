@@ -41,3 +41,7 @@ class AgentState(TypedDict):
     guardrail_retry_count: int
     guardrail_violations: list[str]
     guardrail_suggestion: str | None
+
+    # 시멘틱 캐시
+    cache_hit: bool
+    cache_key: str | None

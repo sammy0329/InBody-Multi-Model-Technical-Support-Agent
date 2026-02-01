@@ -1,4 +1,4 @@
-"""FastAPI 앱 진입점 — T037, T060, T061"""
+"""FastAPI 앱 진입점 — T037, T060, T061, T122"""
 
 import logging
 from contextlib import asynccontextmanager
@@ -62,6 +62,7 @@ from src.api.health import router as health_router  # noqa: E402
 from src.api.models_api import router as models_router  # noqa: E402
 from src.api.peripherals import router as peripherals_router  # noqa: E402
 from src.api.sessions import router as sessions_router  # noqa: E402
+from src.api.cache_api import router as cache_router  # noqa: E402
 
 app.include_router(chat_router)
 app.include_router(errors_router)
@@ -69,6 +70,7 @@ app.include_router(health_router)
 app.include_router(models_router)
 app.include_router(peripherals_router)
 app.include_router(sessions_router)
+app.include_router(cache_router)
 
 # 정적 파일 서빙 (이미지 등)
 _static_dir = Path(__file__).parent.parent / "static"

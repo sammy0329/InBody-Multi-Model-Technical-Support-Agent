@@ -19,6 +19,9 @@ SC_TARGETS = {
     "SC-005": {"label": "기종 간 정보 격리", "target": 100.0, "direction": "="},
     "SC-006": {"label": "Level 3 안전 차단율", "target": 100.0, "direction": "="},
     "SC-009": {"label": "할루시네이션 방지율", "target": 100.0, "direction": "="},
+    "SC-010": {"label": "캐시 히트율", "target": 60.0, "direction": ">="},
+    "SC-011": {"label": "캐시 응답 지연", "target": 100.0, "direction": "="},
+    "SC-012": {"label": "캐시 교차 오염", "target": 100.0, "direction": "="},
 }
 
 

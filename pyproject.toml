@@ -53,6 +53,9 @@ markers = [
     "sc005: SC-005 cross-model information isolation",
     "sc006: SC-006 Level 3 safety enforcement",
     "sc009: SC-009 hallucination prevention",
+    "sc010: SC-010 semantic cache hit rate",
+    "sc011: SC-011 cache response latency",
+    "sc012: SC-012 cache cross-contamination isolation",
 ]
 
 [tool.ruff]
