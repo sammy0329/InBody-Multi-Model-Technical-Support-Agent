@@ -175,14 +175,20 @@ docker compose down -v
 
 ## 5. EC2 배포
 
+> EC2 배포는 Docker를 사용하지 않고 **Python venv + systemd** 방식으로 직접 실행합니다.
+> Docker Compose는 로컬 개발 환경에서만 사용됩니다.
+
 ### 5.1 인스턴스 요구 사항
 
 | 항목 | 권장 |
 |------|------|
-| AMI | Amazon Linux 2023 또는 Ubuntu 22.04 |
-| 인스턴스 타입 | t3.medium 이상 |
-| 스토리지 | 20GB+ (gp3) |
-| 보안 그룹 | 인바운드 8000, 8501 포트 |
+| AMI | Ubuntu 22.04 LTS |
+| 인스턴스 타입 | t3.micro (프리 티어 대상) |
+| 스토리지 | 8GB gp3 |
+| 보안 그룹 | 인바운드 8000, 8501, 22 포트 |
+| Elastic IP | 고정 IP 할당 (stop/start 시 IP 유지) |
+
+> t3.micro는 프리 티어 계정에서 월 750시간 무료입니다. 평일 09-19시 운영 시 월 ~220시간이므로 프리 티어 범위 내에서 운영 가능합니다.
 
 ### 5.2 보안 그룹 설정
 
@@ -201,7 +207,7 @@ EC2 인스턴스 생성 시 `deploy/ec2-userdata.sh`를 UserData로 지정하면
 ```bash
 aws ec2 run-instances \
   --image-id ami-xxxxxxxxx \
-  --instance-type t3.medium \
+  --instance-type t3.micro \
   --key-name my-keypair \
   --security-group-ids sg-xxxxxxxxx \
   --user-data file://deploy/ec2-userdata.sh \
@@ -210,37 +216,65 @@ aws ec2 run-instances \
 
 UserData 스크립트가 수행하는 작업:
 
-1. Docker 및 Docker Compose 설치
+1. Python 3.11 + git + 빌드 도구 설치
 2. 프로젝트 Git 클론
-3. `docker compose build && docker compose up -d`
-4. 초기 데이터 시딩 (최초 1회, 플래그 파일로 중복 방지)
+3. Python venv 생성 및 의존성 설치 (`pip install .`)
+4. systemd 서비스 등록 (`inbody-api.service`, `inbody-ui.service`)
+5. `.env` 파일 존재 시 서비스 자동 시작
 
 ### 5.4 수동 배포
 
 ```bash
 # EC2 인스턴스에 SSH 접속
-ssh -i my-keypair.pem ec2-user@<인스턴스-IP>
+ssh -i my-keypair.pem ubuntu@<인스턴스-IP>
 
 # 프로젝트 클론
 git clone https://github.com/sammy0329/InBody-Multi-Model-Technical-Support-Agent.git
 cd InBody-Multi-Model-Technical-Support-Agent
 
-# .env 파일 생성
-cp .env.example .env
-vi .env  # API 키 등 설정
+# venv 생성 및 의존성 설치
+python3 -m venv .venv
+.venv/bin/pip install --upgrade pip
+.venv/bin/pip install .
 
-# Docker Compose 실행
-docker compose build
-docker compose up -d
+# systemd 서비스 등록
+sudo cp deploy/inbody-api.service /etc/systemd/system/
+sudo cp deploy/inbody-ui.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable inbody-api inbody-ui
 ```
 
-### 5.5 업데이트 배포
+### 5.5 데이터 배포
+
+`.env`, ChromaDB 벡터 데이터, SQLite DB는 로컬에서 SCP로 전송합니다.
 
 ```bash
-cd /home/ec2-user/inbody-app
+# .env 파일
+scp -i my-keypair.pem .env ubuntu@<EC2_IP>:~/InBody-Multi-Model-Technical-Support-Agent/.env
+
+# ChromaDB 벡터 데이터
+scp -i my-keypair.pem -r data/chroma/ ubuntu@<EC2_IP>:~/InBody-Multi-Model-Technical-Support-Agent/data/
+
+# SQLite DB
+scp -i my-keypair.pem data/inbody.db ubuntu@<EC2_IP>:~/InBody-Multi-Model-Technical-Support-Agent/data/inbody.db
+```
+
+> **주의**: `scp -r data/chroma/`를 `data/` 아래로 복사해야 `data/chroma/chroma/`로 중첩되지 않습니다.
+
+### 5.6 서비스 시작
+
+```bash
+sudo systemctl start inbody-api inbody-ui
+sudo systemctl status inbody-api inbody-ui
+```
+
+### 5.7 업데이트 배포
+
+```bash
+cd /home/ubuntu/InBody-Multi-Model-Technical-Support-Agent
 git pull origin main
-docker compose build
-docker compose up -d
+.venv/bin/pip install .
+sudo systemctl restart inbody-api inbody-ui
 ```
 
 ---
@@ -302,52 +336,62 @@ aws cloudformation delete-stack --stack-name inbody-ec2-scheduler
 
 ## 7. 운영 및 모니터링
 
-### 7.1 서비스 상태 확인
+### 7.1 서비스 상태 확인 (EC2 systemd)
 
 ```bash
-# Docker 컨테이너 상태
-docker compose ps
+# systemd 서비스 상태
+sudo systemctl status inbody-api inbody-ui
 
 # API 헬스체크
 curl http://localhost:8000/api/v1/health
-
-# 컨테이너 리소스 사용량
-docker stats
 ```
 
-### 7.2 로그 확인
+### 7.2 로그 확인 (EC2 systemd)
 
 ```bash
-# 전체 로그
-docker compose logs -f
+# API 서비스 로그
+sudo journalctl -u inbody-api -f
 
-# API 로그만
-docker compose logs -f api
+# UI 서비스 로그
+sudo journalctl -u inbody-ui -f
 
 # 최근 100줄
-docker compose logs --tail=100 api
+sudo journalctl -u inbody-api -n 100
 ```
 
-### 7.3 서비스 재시작
+### 7.3 서비스 재시작 (EC2 systemd)
 
 ```bash
 # 전체 재시작
-docker compose restart
+sudo systemctl restart inbody-api inbody-ui
 
 # 특정 서비스만
-docker compose restart api
-docker compose restart ui
+sudo systemctl restart inbody-api
+sudo systemctl restart inbody-ui
 ```
 
-### 7.4 트러블슈팅
+### 7.4 로컬 Docker Compose 환경
+
+```bash
+# 상태 확인
+docker compose ps
+
+# 로그
+docker compose logs -f
+
+# 재시작
+docker compose restart
+```
+
+### 7.5 트러블슈팅
 
 | 증상 | 원인 | 해결 |
 |------|------|------|
-| ui 서비스 시작 안 됨 | api 헬스체크 실패 | `docker compose logs api`로 에러 확인 |
-| API 응답 없음 | `.env` 파일 누락 | `.env` 파일 생성 및 API 키 확인 |
-| ChromaDB 에러 | 데이터 디렉토리 권한 | `chmod -R 777 data/` |
+| 서비스 시작 실패 | `.env` 파일 누락 | `.env` 파일 생성 및 API 키 확인 |
+| ChromaDB 에러 | 데이터 디렉토리 권한 | `sudo chown -R ubuntu:ubuntu data/` |
+| ChromaDB 검색 안 됨 | 디렉토리 중첩 (data/chroma/chroma/) | SCP 복사 경로 확인, 파일을 올바른 위치로 이동 |
 | 스케줄러 미작동 | CloudFormation 스택 미배포 | `aws cloudformation describe-stacks` 확인 |
-| 컨테이너 OOM | 메모리 부족 | t3.medium 이상 인스턴스 사용 |
+| 메모리 부족 (OOM) | t3.micro 1GB 한계 | uvicorn worker 1개 유지, 불필요한 프로세스 정리 |
 
 ### 7.5 포트 구성 요약
 

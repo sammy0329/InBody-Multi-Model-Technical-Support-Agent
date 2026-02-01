@@ -15,8 +15,8 @@
 | 구조화 DB | SQLite + aiosqlite | 3.x | PostgreSQL, MongoDB | 로컬 파일 기반 경량 DB + 비동기 지원, 프로덕션 전환 용이 |
 | 백엔드 | FastAPI | >=0.115 | Flask, Django | async/await 네이티브 + SSE 스트리밍 + 자동 OpenAPI 문서 |
 | 프론트엔드 | Streamlit | >=1.40 | React, Gradio | 채팅 UI 내장 컴포넌트로 빠른 프로토타이핑 |
-| 컨테이너 | Docker Compose | v2 | Kubernetes | 2서비스 규모에 적합한 경량 오케스트레이션 |
-| 클라우드 | AWS EC2 Spot (t3.small) | - | Lambda, ECS Fargate | 로컬 파일 DB 호환 + 온디맨드 대비 60-90% 비용 절감 |
+| 컨테이너 | Docker Compose (로컬) / systemd (EC2) | v2 | Kubernetes | 로컬: Docker Compose, EC2: venv + systemd 직접 실행으로 메모리 절약 |
+| 클라우드 | AWS EC2 (t3.micro, 프리 티어) | - | Lambda, ECS Fargate | 로컬 파일 DB 호환 + 프리 티어로 무료 운영 가능 |
 | IaC | CloudFormation | - | Terraform, CDK | AWS 네이티브 + EventBridge/Lambda 스케줄링 통합 |
 | 테스트 | pytest | >=8.0 | unittest | parametrize로 444개 케이스 효율 커버 + 플러그인 생태계 |
 | 코드 품질 | Ruff | >=0.8 | Black + isort + flake8 | 단일 도구로 린팅 + 포매팅 통합 |
@@ -298,57 +298,46 @@ if prompt := st.chat_input("질문을 입력하세요"):
 
 ### 2.5 Infrastructure
 
-#### Docker Compose (v2)
+#### Docker Compose (로컬 개발) / systemd (EC2 배포)
 
-**What**: 멀티 컨테이너 Docker 애플리케이션을 정의하고 실행하기 위한 도구이다.
+**What**: 로컬 개발 환경에서는 Docker Compose로 2개 서비스를 실행하고, EC2 배포 환경에서는 Python venv + systemd로 직접 실행한다.
 
-**Why**: 본 프로젝트는 API 서버(FastAPI, 포트 8000)와 UI 서버(Streamlit, 포트 8501)의 2개 서비스로 구성된다. Kubernetes는 서비스 디스커버리, 오토스케일링, 롤링 업데이트 등 강력한 기능을 제공하지만, 2개 서비스 규모에서는 `kubectl`, Helm 차트, YAML 매니페스트 관리 등의 학습 곡선과 운영 오버헤드가 이점을 압도한다.
+**Why**: 본 프로젝트는 API 서버(FastAPI, 포트 8000)와 UI 서버(Streamlit, 포트 8501)의 2개 서비스로 구성된다. 로컬 개발에서 Docker Compose는 `docker compose up -d` 한 줄로 전체 스택을 기동할 수 있어 간결하다.
 
-Docker Compose는 `docker-compose.yml` 하나로 두 서비스의 빌드, 네트워크, 볼륨, 환경변수를 선언적으로 관리할 수 있다. `docker compose up -d` 한 줄로 전체 스택을 기동하고, `docker compose down`으로 정리할 수 있어 개발과 배포 모두 간결하다.
+그러나 EC2 배포 환경(t3.micro, 메모리 1GB)에서는 Docker 데몬 자체의 메모리 오버헤드(~200MB)가 부담된다. venv + systemd 방식은 Docker 없이 Python 프로세스를 직접 실행하여 메모리를 절약한다. systemd는 `Restart=always` 설정으로 프로세스 크래시 시 자동 재시작, `Requires`/`After` 설정으로 서비스 간 의존성 관리, `journalctl`로 로그 조회 등 Docker Compose와 동등한 서비스 관리 기능을 제공한다.
 
-**How**: 2개 서비스를 정의하고 공유 볼륨으로 데이터를 연결한다.
+**How**: EC2에서는 2개의 systemd unit 파일로 서비스를 관리한다.
 
-```yaml
-# docker-compose.yml
-services:
-  api:
-    build: .
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
-    ports:
-      - "8000:8000"
-    volumes:
-      - ./data:/app/data
-    env_file:
-      - .env
+```ini
+# deploy/inbody-api.service
+[Service]
+ExecStart=/home/ubuntu/InBody-Multi-Model-Technical-Support-Agent/.venv/bin/uvicorn src.main:app --host 0.0.0.0 --port 8000
+Restart=always
 
-  ui:
-    build: .
-    command: streamlit run app/ui/main.py --server.port 8501
-    ports:
-      - "8501:8501"
-    depends_on:
-      - api
-    env_file:
-      - .env
+# deploy/inbody-ui.service
+[Service]
+Requires=inbody-api.service
+ExecStart=.venv/bin/streamlit run ui/app.py --server.port=8501 --server.address=0.0.0.0
+Restart=always
 ```
 
-**Trade-offs**: 단일 호스트에서만 실행 가능하여 수평 확장이 불가능하다. 헬스체크, 자동 재시작, 로드 밸런싱 등의 프로덕션 기능이 제한적이다. 서비스 규모가 커지면 Kubernetes 또는 ECS로 전환이 필요하다.
+**Trade-offs**: systemd 방식은 Docker의 이미지 빌드/배포, 환경 격리 이점을 포기한다. 의존성 변경 시 EC2에서 직접 `pip install`을 실행해야 하며, 호스트 OS에 직접 의존한다. 서비스 규모가 커지면 Docker 또는 ECS로 전환이 필요하다.
 
 ---
 
-#### AWS EC2 Spot Instance (t3.small)
+#### AWS EC2 (t3.micro, 프리 티어)
 
-**What**: AWS의 유휴 용량을 활용하는 인스턴스 유형으로, 온디맨드 대비 60~90% 저렴하다.
+**What**: AWS 프리 티어 대상 인스턴스로, 신규 계정 기준 월 750시간 무료 사용이 가능하다. vCPU 2개, 메모리 1GB를 제공한다.
 
 **Why**: ChromaDB와 SQLite가 모두 로컬 파일 시스템 기반이므로 서버리스(AWS Lambda)는 사용할 수 없다. Lambda는 실행 시 임시 파일 시스템(/tmp)만 제공하며, 함수 종료 시 데이터가 사라진다. EFS를 마운트하는 방법이 있지만 벡터 DB의 랜덤 I/O 패턴에서 성능이 크게 떨어진다.
 
-ECS Fargate는 컨테이너 단위 서버리스로 파일 시스템 문제는 EFS로 우회할 수 있으나, 상시 실행 시 EC2 Spot 대비 2~3배 비용이 발생한다. t3.small(vCPU 2, 메모리 2GB)은 본 프로젝트의 워크로드(동시 사용자 수십 명 이하)에 충분한 사양이다.
+t3.micro(vCPU 2, 메모리 1GB)는 데모 환경(동시 사용자 5명 이하)에서 충분한 사양이다. Docker를 사용하지 않고 venv + systemd로 직접 실행하여 메모리 오버헤드를 최소화하고, uvicorn worker를 1개로 운영한다. EventBridge + Lambda로 평일 09-19시 KST에만 운영하여 월 ~220시간만 사용하므로 프리 티어 범위(750시간) 내에서 운영 가능하다.
 
-Spot 인스턴스의 중단 위험은 EventBridge + Lambda로 평일 09-19시 KST에만 운영하여 완화한다. 업무 시간 외에는 인스턴스를 중지하므로 비용이 추가로 절감된다.
+Elastic IP를 연결하여 EC2 stop/start 시에도 고정 IP를 유지한다.
 
-**How**: CloudFormation 템플릿에서 Spot 인스턴스를 정의하고, 스케줄링을 설정한다.
+**How**: CloudFormation 템플릿에서 EventBridge + Lambda 스케줄러를 정의하고, EC2 인스턴스의 자동 start/stop을 관리한다. 인스턴스 시작 시 systemd에 등록된 서비스가 자동으로 기동된다.
 
-**Trade-offs**: Spot 인스턴스는 AWS에 의해 2분 전 경고 후 회수될 수 있다. EBS 볼륨에 데이터를 영속화하고 인스턴스 재시작 시 자동으로 Docker Compose를 기동하는 스크립트를 User Data에 포함하여 이 위험을 완화한다.
+**Trade-offs**: t3.micro의 1GB 메모리는 동시 요청이 많아지면 OOM 위험이 있다. uvicorn worker를 1개로 제한하여 메모리를 관리하되, 동시 처리 능력이 떨어진다. 사용량 증가 시 t3.small(2GB) 이상으로 업그레이드가 필요하다. 프리 티어 기간(12개월) 종료 후에는 온디맨드 요금이 발생하므로 Spot 인스턴스 전환을 고려할 수 있다.
 
 ---
 
@@ -584,7 +573,7 @@ settings = Settings()
 | Vector DB | ChromaDB (로컬 파일, 임베디드 모드) | Pinecone (매니지드 클라우드) | `pip install .[prod]` + `VECTOR_DB_PROVIDER` 환경변수 변경 |
 | Structured DB | SQLite (로컬 파일, aiosqlite) | PostgreSQL (RDS, asyncpg) | `STRUCTURED_DB_URL` 환경변수 변경 |
 | LLM | GPT-4o-mini | GPT-4o-mini (또는 GPT-4o) | `OPENAI_MODEL` 환경변수 변경 |
-| 컨테이너 | Docker Compose (로컬) | Docker Compose on EC2 | `docker compose up -d` |
+| 컨테이너 | Docker Compose (로컬) | systemd + venv (EC2) | systemd service 파일 배포 |
 | SSL | 없음 (localhost) | ALB/Nginx + Let's Encrypt | 리버스 프록시 추가 |
 
 ### 전환 상세
