@@ -265,6 +265,50 @@
 
 ---
 
+## Phase 13: 테스트 스위트 구현
+
+**Purpose**: 3계층 테스트(Unit/Contract/Evaluation)로 SC 메트릭 전수 검증 — LLM API 키 없이 결정론적 테스트만으로 성공 기준 달성률 측정
+
+### 테스트 인프라
+
+- [x] T088 tests/conftest.py에 SCMetricsCollector 구현 — SC별 pass/fail 누적, pytest_terminal_summary 훅으로 세션 종료 시 SC 리포트 자동 출력
+- [x] T089 [P] pyproject.toml에 pytest markers 추가 — unit, contract, evaluation, sc001~sc009 마커 등록
+
+### Unit 테스트 (194 케이스)
+
+- [x] T090 [P] tests/unit/test_model_router.py — SC-001 기종 식별 정규식 검증 (_pre_extract_model 40개 한국어 패턴 + _extract_all_models 비교 질문 감지 + _build_comparison_response 구조)
+- [x] T091 [P] tests/unit/test_guardrail_deterministic.py — SC-004/SC-005/SC-006 가드레일 결정론적 체크 검증 (면책 문구 자동 삽입, 4x4 기종 격리, UNSAFE_REPAIR_KEYWORDS 감지, 최대 재시도 폴백)
+- [x] T092 [P] tests/unit/test_troubleshoot_utils.py — SC-009 보조 검증 (_extract_error_code 14패턴 + _is_escalation 18키워드)
+- [x] T093 [P] tests/unit/test_edges.py — 라우팅 분기 정확성 (route_after_model_router/intent_router/guardrail 15케이스)
+- [x] T094 [P] tests/unit/test_tone_profiles.py — 톤앤매너 매핑 (casual/professional 내용 + 4기종별 톤+티어)
+- [x] T095 [P] tests/unit/test_clinical_utils.py — 진단 요청 감지 (DIAGNOSIS_KEYWORDS 18개 양성 + 일반 질문 5개 음성)
+- [x] T096 [P] tests/unit/test_connect_utils.py — 주변기기 추출 (_extract_peripheral_type 14패턴 + _extract_peripheral_name 8패턴)
+- [x] T097 [P] tests/unit/test_install_utils.py — 설치 문제 감지 (INSTALL_TROUBLE_KEYWORDS 양성 + 일반 질문 음성)
+
+### Contract 테스트 (11 케이스)
+
+- [x] T098 [P] tests/contract/test_models_api.py — GET /models 엔드포인트 계약 검증 (4기종 반환, 응답 필드 구조, 270S 상세, 404 미지원)
+- [x] T099 [P] tests/contract/test_errors_api.py — GET /models/{id}/errors 엔드포인트 계약 검증 (Seeded DB 기반, 에러 목록/상세/404/400)
+
+### Evaluation 테스트 (166 케이스)
+
+- [x] T100 tests/evaluation/conftest.py에 seeded_session_factory 픽스처 구현 — error_codes.json + peripheral_compatibility.json을 인메모리 SQLite에 시딩
+- [x] T101 [P] tests/evaluation/test_sc001_model_identification.py — SC-001 기종 식별 정확도 40케이스 (4기종 × 10패턴, sc_metrics.record 연동)
+- [x] T102 [P] tests/evaluation/test_sc003_error_resolution.py — SC-003 에러코드 해결 정확도 20케이스 (4기종 × 5코드, 제목/레벨/해결 키워드 3중 검증)
+- [x] T103 [P] tests/evaluation/test_sc003_peripheral_compat.py — SC-003 호환표 정확도 25케이스 (4기종 × 주변기기, 호환상태/연결방식/설정 키워드 3중 검증)
+- [x] T104 [P] tests/evaluation/test_sc004_disclaimer.py — SC-004 면책 문구 삽입률 20케이스 (임상 15건 포함 확인 + 비임상 5건 미포함 확인)
+- [x] T105 [P] tests/evaluation/test_sc005_model_isolation.py — SC-005 기종 격리 16케이스 (4x4 조합, 교차 12건 위반 감지 + 동일 4건 통과)
+- [x] T106 [P] tests/evaluation/test_sc006_level3_safety.py — SC-006 Level 3 안전 차단율 24케이스 (unsafe 8건 차단 + safe 8건 보존 + Level 1 오탐 방지 8건)
+- [x] T107 [P] tests/evaluation/test_sc009_hallucination.py — SC-009 할루시네이션 방지율 21케이스 (미등록 12건 거부 + 등록 9건 정상 조회)
+
+### 문서화
+
+- [x] T108 docs/test-report.md에 테스트 아키텍처, SC 메트릭 결과, 발견 이슈, 실행 방법 문서화
+
+**Checkpoint**: 385 케이스 전수 통과, SC-001~SC-009 달성률 100%, LLM 키 불필요
+
+---
+
 ## 의존성 및 실행 순서
 
 ### Phase 의존성
@@ -278,6 +322,7 @@
 - **Phase 10 (Streamlit UI)**: Phase 3 완료 필요 (기본 API 엔드포인트 필요) — Phase 4~9와 병렬 가능
 - **Phase 11 (배포)**: Phase 10 + Phase 8 완료 필요
 - **Phase 12 (UX/품질)**: Phase 10 + Phase 11 완료 필요 — 운영 후 개선
+- **Phase 13 (테스트)**: Phase 12 완료 필요 — SC 메트릭 전수 검증
 
 ### User Story 의존성
 
