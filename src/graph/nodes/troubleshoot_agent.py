@@ -60,6 +60,29 @@ async def troubleshoot_agent_node(state: AgentState) -> dict:
             "model": model_id,
             "error_code": error_code,
         })
+
+        # 미등록 에러 코드: LLM 우회하여 고정 응답 반환 (할루시네이션 방지)
+        if "찾을 수 없습니다" in error_result:
+            # 해당 기종의 등록된 에러 코드 목록 조회
+            all_errors = await search_errors_by_symptom.ainvoke({
+                "model": model_id,
+                "symptom_description": "",
+            })
+            answer = (
+                f"InBody {model_id} 기종에 에러 코드 **{error_code}**은(는) "
+                f"등록되지 않은 코드입니다.\n\n"
+                f"해당 에러 코드가 실제로 기기 화면에 표시된다면, "
+                f"InBody 서비스 센터(☎ **1588-3930**)로 문의해 주세요.\n\n"
+                f"참고로, {model_id} 기종에 등록된 에러 코드는 다음과 같습니다:\n"
+                f"{all_errors}"
+            )
+            return {
+                "answer": answer,
+                "error_code": error_code,
+                "support_level": None,
+                "image_urls": [],
+            }
+
         context_parts.append(f"[에러 코드 조회 결과]\n{error_result}")
 
         # support_level 추출
