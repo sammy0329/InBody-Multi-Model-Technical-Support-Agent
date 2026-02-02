@@ -19,6 +19,16 @@
   <img src="https://img.shields.io/badge/License-MIT-blue" alt="License" />
 </p>
 
+<p align="center">
+  <a href="http://3.34.66.201:8501">Live Demo</a> · <a href="https://youtu.be/09NBCzF4-cU?si=Z1bcVCDayxHEq6Kg">Video Demo</a>
+</p>
+
+<p align="center">
+  <a href="https://youtu.be/09NBCzF4-cU?si=Z1bcVCDayxHEq6Kg">
+    <img src="https://img.youtube.com/vi/09NBCzF4-cU/hqdefault.jpg" alt="Video Demo" width="560" />
+  </a>
+</p>
+
 ---
 
 ## Pain Point & Solution
