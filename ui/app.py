@@ -41,7 +41,8 @@ MODEL_CHOICES = [
 def _handle_model_selection(model_id: str) -> None:
     """기종 선택 버튼 클릭 시 상태 업데이트 후 rerun."""
     original_q = st.session_state["messages"][-2]["content"]
-    st.session_state["messages"] = st.session_state["messages"][:-2]
+    st.session_state["messages"] = []
+    st.session_state["thread_id"] = generate_thread_id()
     st.session_state["_model_from_chat"] = model_id
     st.session_state["pending_question"] = original_q
     st.rerun()
