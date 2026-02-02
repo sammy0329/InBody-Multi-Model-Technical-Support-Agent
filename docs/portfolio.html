@@ -1,0 +1,813 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Portfolio — 안성재</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      @page {
+        size: A4;
+        margin: 14mm 16mm;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family:
+          "Noto Sans KR",
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        font-size: 9pt;
+        line-height: 1.5;
+        color: #222;
+        width: 210mm;
+        min-height: 297mm;
+        margin: 0 auto;
+        padding: 14mm 16mm;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      /* ── Header ── */
+      .header {
+        padding-bottom: 14px;
+        border-bottom: 2.5px solid #111;
+        margin-bottom: 18px;
+      }
+      .header-left h1 {
+        font-size: 26pt;
+        font-weight: 900;
+        letter-spacing: -1px;
+        line-height: 1.1;
+      }
+      .tagline {
+        font-size: 9.5pt;
+        color: #555;
+        margin-top: 5px;
+        font-weight: 400;
+      }
+      .header-links {
+        display: flex;
+        gap: 10px;
+        margin-top: 8px;
+      }
+      .header-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 6px 16px;
+        border: 1.5px solid #222;
+        border-radius: 6px;
+        font-size: 8pt;
+        font-weight: 700;
+        color: #222;
+        text-decoration: none;
+        background: #fff;
+        transition: all 0.15s;
+      }
+      .header-btn:hover {
+        background: #222;
+        color: #fff;
+      }
+      .header-btn svg {
+        width: 14px;
+        height: 14px;
+        fill: currentColor;
+      }
+
+      /* ── Link Buttons ── */
+      .links-row {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+      .link-btn {
+        padding: 5px 14px;
+        border: 1.5px solid #1d4ed8;
+        border-radius: 6px;
+        font-size: 8pt;
+        font-weight: 700;
+        color: #1d4ed8;
+        text-decoration: none;
+        background: #eff6ff;
+        transition: all 0.2s;
+      }
+      .link-btn:hover {
+        background: #1d4ed8;
+        color: #fff;
+      }
+      .link-btn span {
+        font-weight: 400;
+        color: #555;
+        margin-left: 4px;
+      }
+      .link-btn:hover span {
+        color: #dbeafe;
+      }
+
+      /* ── Section ── */
+      .section {
+        margin-bottom: 20px;
+      }
+      .section-title {
+        font-size: 10pt;
+        font-weight: 900;
+        color: #111;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding-bottom: 4px;
+        border-bottom: 1.5px solid #222;
+        margin-bottom: 8px;
+      }
+
+      /* ── Skills ── */
+      .skills-category {
+        margin-bottom: 7px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .skills-label {
+        font-size: 7.5pt;
+        font-weight: 700;
+        color: #888;
+        min-width: 62px;
+        text-transform: uppercase;
+      }
+      .skill-tag {
+        display: inline-block;
+        padding: 2px 9px;
+        border-radius: 4px;
+        font-size: 7.5pt;
+        font-weight: 700;
+        color: #fff;
+        margin-right: 3px;
+      }
+      .t-backend {
+        background: #2563eb;
+      }
+      .t-db {
+        background: #0891b2;
+      }
+      .t-ai {
+        background: #7c3aed;
+      }
+      .t-frontend {
+        background: #ea580c;
+      }
+      .t-devops {
+        background: #059669;
+      }
+      .t-tool {
+        background: #475569;
+      }
+
+      /* ── Project ── */
+      .project-title-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 4px;
+      }
+      .project-title-row h3 {
+        font-size: 11pt;
+        font-weight: 900;
+      }
+      .project-title-row .meta {
+        font-size: 7.5pt;
+        color: #999;
+      }
+      .project-desc {
+        font-size: 8.5pt;
+        color: #444;
+        margin-bottom: 6px;
+        line-height: 1.55;
+      }
+      .tech-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-bottom: 10px;
+      }
+      .tech-tag {
+        padding: 1px 8px;
+        border: 1px solid #cbd5e1;
+        border-radius: 3px;
+        font-size: 7pt;
+        color: #475569;
+        background: #f8fafc;
+      }
+
+      /* ── Architecture ── */
+      .arch-container {
+        text-align: center;
+        margin: 8px 0 12px;
+      }
+      .arch-img {
+        max-width: 100%;
+        max-height: 160px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+      }
+      .arch-caption {
+        font-size: 7pt;
+        color: #999;
+        margin-top: 3px;
+      }
+
+      /* ── Pain Point Table ── */
+      table.clean {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 8pt;
+        margin-bottom: 10px;
+      }
+      table.clean th {
+        background: #f1f5f9;
+        font-weight: 700;
+        text-align: left;
+        padding: 5px 8px;
+        border-bottom: 1.5px solid #cbd5e1;
+      }
+      table.clean td {
+        padding: 4px 8px;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: top;
+      }
+      table.clean td:first-child {
+        font-weight: 600;
+      }
+
+      /* ── Challenge Section ── */
+      .challenge-grid {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+      .ch-card {
+        flex: 1;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 9px 10px;
+        background: #fafbfc;
+      }
+      .ch-card .ch-num {
+        font-size: 7pt;
+        font-weight: 700;
+        color: #1d4ed8;
+        text-transform: uppercase;
+        margin-bottom: 2px;
+      }
+      .ch-card h4 {
+        font-size: 9pt;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      .ch-card p {
+        font-size: 7.5pt;
+        color: #555;
+        line-height: 1.5;
+      }
+      .ch-card .ch-detail {
+        font-size: 7pt;
+        color: #666;
+        margin-top: 3px;
+        line-height: 1.45;
+      }
+      .ch-result {
+        margin-top: 5px;
+        font-size: 7.5pt;
+        font-weight: 700;
+        color: #059669;
+        padding-top: 4px;
+        border-top: 1px solid #e2e8f0;
+      }
+
+      /* ── Metrics ── */
+      .metrics-row {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 12px;
+      }
+      .metric-box {
+        flex: 1;
+        text-align: center;
+        padding: 7px 4px;
+        border: 1.5px solid #d1fae5;
+        border-radius: 8px;
+        background: #f0fdf4;
+      }
+      .metric-box .val {
+        font-size: 16pt;
+        font-weight: 900;
+        color: #059669;
+      }
+      .metric-box .lbl {
+        font-size: 6.5pt;
+        color: #666;
+        margin-top: 1px;
+      }
+
+      /* ── Experience ── */
+      .exp-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 7px;
+        padding-bottom: 7px;
+        border-bottom: 1px solid #f3f4f6;
+      }
+      .exp-item:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+      }
+      .exp-left {
+        flex: 1;
+      }
+      .exp-left h4 {
+        font-size: 9pt;
+        font-weight: 700;
+      }
+      .exp-sub {
+        font-size: 8pt;
+        color: #666;
+      }
+      .exp-detail {
+        font-size: 7.5pt;
+        color: #777;
+        margin-top: 2px;
+        padding-left: 12px;
+      }
+      .exp-detail li {
+        margin-bottom: 1px;
+      }
+      .exp-right {
+        font-size: 7.5pt;
+        color: #999;
+        min-width: 110px;
+        text-align: right;
+      }
+
+      /* ── Page Break ── */
+      .page-break {
+        page-break-before: always;
+        padding-top: 0;
+      }
+
+      /* ── Print ── */
+      @media print {
+        body {
+          width: auto;
+          padding: 0;
+        }
+        .link-btn {
+          border-color: #93c5fd;
+          background: #eff6ff !important;
+        }
+        .link-btn:hover {
+          background: #eff6ff !important;
+          color: #1d4ed8 !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ══════════════════════ PAGE 1 ══════════════════════ -->
+
+    <div class="header">
+      <div class="header-left">
+        <h1>안성재</h1>
+        <div class="tagline">
+          아이디어는 누구나 가질 수 있지만, 실행은 아무나 할 수 없습니다. 저는
+          실행력 있는 개발자입니다.
+        </div>
+        <div class="header-links">
+          <a
+            class="header-btn"
+            href="https://github.com/sammy0329"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <svg viewBox="0 0 16 16">
+              <path
+                d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+              />
+            </svg>
+            GitHub
+          </a>
+          <a
+            class="header-btn"
+            href="https://velog.io/@sammy0329/series"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M3 3h18v18H3V3zm2 2v14h14V5H5zm2 2h10v2H7V7zm0 4h10v2H7v-2zm0 4h7v2H7v-2z"
+              />
+            </svg>
+            Blog
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skills -->
+    <div class="section">
+      <div class="section-title">Skills</div>
+      <div class="skills-category">
+        <span class="skills-label">Backend</span>
+        <span class="skill-tag t-backend">Python</span>
+        <span class="skill-tag t-backend">Java</span>
+        <span class="skill-tag t-backend">Spring Boot</span>
+        <span class="skill-tag t-backend">FastAPI</span>
+      </div>
+      <div class="skills-category">
+        <span class="skills-label">DB</span>
+        <span class="skill-tag t-db">MySQL</span>
+        <span class="skill-tag t-db">PostgreSQL</span>
+        <span class="skill-tag t-db">Redis</span>
+        <span class="skill-tag t-db">Supabase</span>
+        <span class="skill-tag t-db">S3</span>
+      </div>
+      <div class="skills-category">
+        <span class="skills-label">AI / Data</span>
+        <span class="skill-tag t-ai">LangGraph</span>
+        <span class="skill-tag t-ai">ChromaDB</span>
+      </div>
+      <div class="skills-category">
+        <span class="skills-label">Frontend</span>
+        <span class="skill-tag t-frontend">Streamlit</span>
+      </div>
+      <div class="skills-category">
+        <span class="skills-label">DevOps</span>
+        <span class="skill-tag t-devops">Docker</span>
+        <span class="skill-tag t-devops">AWS EC2</span>
+        <span class="skill-tag t-devops">Jenkins</span>
+        <span class="skill-tag t-devops">NginX</span>
+      </div>
+      <div class="skills-category">
+        <span class="skills-label">Tools</span>
+        <span class="skill-tag t-tool">OpenAI</span>
+        <span class="skill-tag t-tool">Claude AI</span>
+        <span class="skill-tag t-tool">Cursor</span>
+        <span class="skill-tag t-tool">Git</span>
+      </div>
+    </div>
+
+    <!-- ── Core Project ── -->
+    <div class="section">
+      <div class="section-title">Core Project</div>
+
+      <div class="project-title-row">
+        <h3>InBody Multi-Agent Technical Support System</h3>
+        <span class="meta"
+          >2026.01.30 - 2026.02.01 | 개인 프로젝트 · 기획~배포 1인 전담</span
+        >
+      </div>
+      <div class="project-desc">
+        인바디 체성분 분석기 4개 기종(270S/580/770S/970S)의 기술 지원을
+        자동화하는 LangGraph 기반 멀티 에이전트 시스템.<br />
+        사용자 질문 → 기종 자동 식별 → 의도 분류 → 5개 전문 에이전트 → 4단계
+        가드레일을 거쳐 안전한 응답을 생성하는 end-to-end 파이프라인.
+      </div>
+
+      <div class="links-row" style="margin-bottom: 8px">
+        <a
+          class="link-btn"
+          href="https://github.com/sammy0329/InBody-Multi-Model-Technical-Support-Agent"
+        >
+          <svg
+            viewBox="0 0 16 16"
+            style="
+              width: 12px;
+              height: 12px;
+              fill: #1d4ed8;
+              vertical-align: -1px;
+              margin-right: 3px;
+            "
+          >
+            <path
+              d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+            />
+          </svg>
+          Repository
+        </a>
+        <a class="link-btn" href="http://3.34.66.201:8501">
+          <svg
+            viewBox="0 0 24 24"
+            style="
+              width: 12px;
+              height: 12px;
+              fill: #1d4ed8;
+              vertical-align: -1px;
+              margin-right: 3px;
+            "
+          >
+            <path
+              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"
+            />
+          </svg>
+          Live Demo
+        </a>
+        <a class="link-btn" href="https://youtu.be/09NBCzF4-cU?si=Z1bcVCDayxHEq6Kg">
+          <svg
+            viewBox="0 0 24 24"
+            style="
+              width: 12px;
+              height: 12px;
+              fill: #1d4ed8;
+              vertical-align: -1px;
+              margin-right: 3px;
+            "
+          >
+            <path
+              d="M21.58 7.19c-.23-.86-.91-1.54-1.77-1.77C18.25 5 12 5 12 5s-6.25 0-7.81.42c-.86.23-1.54.91-1.77 1.77C2 8.75 2 12 2 12s0 3.25.42 4.81c.23.86.91 1.54 1.77 1.77C5.75 19 12 19 12 19s6.25 0 7.81-.42c.86-.23 1.54-.91 1.77-1.77C22 15.25 22 12 22 12s0-3.25-.42-4.81zM10 15V9l5 3-5 3z"
+            />
+          </svg>
+          Video Demo
+        </a>
+      </div>
+
+      <div class="tech-tags">
+        <span class="tech-tag">Python 3.11</span>
+        <span class="tech-tag">LangGraph</span>
+        <span class="tech-tag">GPT-4o-mini</span>
+        <span class="tech-tag">ChromaDB</span>
+        <span class="tech-tag">SQLite</span>
+        <span class="tech-tag">FastAPI</span>
+        <span class="tech-tag">Streamlit</span>
+        <span class="tech-tag">Docker Compose</span>
+        <span class="tech-tag">AWS EC2</span>
+        <span class="tech-tag">CloudFormation</span>
+        <span class="tech-tag">SSE Streaming</span>
+        <span class="tech-tag">pytest</span>
+      </div>
+
+      <!-- Pain Point & Solution -->
+      <table class="clean">
+        <thead>
+          <tr>
+            <th style="width: 30%">Pain Point</th>
+            <th style="width: 35%">해결 전략</th>
+            <th style="width: 35%">구현</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>기종별 매뉴얼 탐색 불편</td>
+            <td>
+              RAG로 관련 섹션만 검색 + Tool Calling으로 에러코드 정확 조회
+            </td>
+            <td>ChromaDB 벡터 검색 + SQLite 구조화 조회</td>
+          </tr>
+          <tr>
+            <td>기종 미특정 시 부정확한 안내</td>
+            <td>텍스트 기반 기종 자동 식별 + 3계층 격리</td>
+            <td>model_router + 물리/논리/후처리 격리</td>
+          </tr>
+          <tr>
+            <td>하드웨어 문제 안전 안내</td>
+            <td>위험 키워드 탐지 → 자동 차단 + 서비스센터 안내</td>
+            <td>가드레일 Check 3 + HARDWARE_DISCLAIMER</td>
+          </tr>
+          <tr>
+            <td>반복 질문 비용·지연</td>
+            <td>시멘틱 캐시로 유사 질문 즉시 응답</td>
+            <td>cosine 0.92 캐시 + 의도별 TTL (7일~90일)</td>
+          </tr>
+          <tr>
+            <td>운영 비용</td>
+            <td>EC2 프리 티어 + 평일만 운영</td>
+            <td>CloudFormation + EventBridge 스케줄러 (~$8/월)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Architecture -->
+      <div class="arch-container">
+        <!-- TODO: mermaid.live에서 PNG 내보낸 후 architecture.png로 교체 -->
+        <img
+          class="arch-img"
+          src="architecture.png"
+          alt="11 Nodes · 4 Conditional Edges · LangGraph StateGraph"
+        />
+        <div class="arch-caption">
+          11개 노드 · 4개 조건부 엣지 · AgentState(17필드) 기반 LangGraph
+          StateGraph 워크플로우
+        </div>
+      </div>
+
+      <!-- Metrics -->
+      <div class="metrics-row">
+        <div class="metric-box">
+          <div class="val">444</div>
+          <div class="lbl">테스트 전체 PASS</div>
+        </div>
+        <div class="metric-box">
+          <div class="val">9/9</div>
+          <div class="lbl">SC 품질 지표</div>
+        </div>
+        <div class="metric-box">
+          <div class="val">100%</div>
+          <div class="lbl">기종 식별 정확도</div>
+        </div>
+        <div class="metric-box">
+          <div class="val">0%</div>
+          <div class="lbl">기종 간 정보 오염</div>
+        </div>
+        <div class="metric-box">
+          <div class="val">&le;200ms</div>
+          <div class="lbl">캐시 히트 응답</div>
+        </div>
+        <div class="metric-box">
+          <div class="val">~$8</div>
+          <div class="lbl">월 운영 비용</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════ PAGE 2 ══════════════════════ -->
+    <div class="page-break"></div>
+
+    <!-- Technical Challenges Detail -->
+    <div class="section">
+      <div class="section-title">Technical Challenges & Solutions</div>
+
+      <div class="challenge-grid">
+        <div class="ch-card">
+          <div class="ch-num">Challenge 1</div>
+          <h4>기종 간 정보 오염 방지</h4>
+          <p>
+            4개 기종은 각각 별도의 매뉴얼·에러코드 체계를 보유. 기종별 RAG
+            컬렉션을 분리하지 않으면 다른 기종의 정보가 섞여 부정확한 안내로
+            이어짐.
+          </p>
+          <div class="ch-detail">
+            <strong>Solution — 3계층 격리 아키텍처</strong><br />
+            Layer 1: ChromaDB 기종별 독립 컬렉션 (물리적 격리)<br />
+            Layer 2: <code>where: {model: '770S'}</code> 메타데이터 필터 (논리적
+            격리)<br />
+            Layer 3: 가드레일 regex로 다른 기종명 패턴 감지 (후처리 격리)
+          </div>
+          <div class="ch-result">
+            100% 격리 — 4&times;4 기종 조합 16케이스 전수 검증
+          </div>
+        </div>
+
+        <div class="ch-card">
+          <div class="ch-num">Challenge 2</div>
+          <h4>할루시네이션 0% 달성</h4>
+          <p>
+            LLM이 미등록 에러코드에 대해 그럴듯한 추측 응답을 생성할 위험. 기술
+            지원에서 추측은 곧 오진.
+          </p>
+          <div class="ch-detail">
+            <strong>Solution — 결정론적 가드레일 우선 설계</strong><br />
+            Check 1: 의료기기 면책문구 자동 삽입 (soft-fix)<br />
+            Check 2: regex로 다른 기종명 감지 시 hard-fail<br />
+            Check 3: 위험 키워드 8개 탐지 → 서비스센터 안내 (hard-fail)<br />
+            Check 4: LLM 정합성 검증 (보조 수단)<br />
+            핵심 안전 로직(1~3)은 코드로 보장, LLM은 마지막 보조.
+          </div>
+          <div class="ch-result">
+            할루시네이션 방지 100% (21/21) · 안전 차단 100% (24/24)
+          </div>
+        </div>
+
+        <div class="ch-card">
+          <div class="ch-num">Challenge 3</div>
+          <h4>시멘틱 캐시 비용·지연 최적화</h4>
+          <p>
+            전체 워크플로우가 LLM을 평균 4회 호출하며 약 3~5초 소요. 반복 질문에
+            매번 이 비용을 지불할 필요 없음.
+          </p>
+          <div class="ch-detail">
+            <strong>Solution — ChromaDB 기반 시멘틱 캐시</strong><br />
+            cosine 유사도 0.92 임계값으로 의미적 동일 질문 매칭<br />
+            기종별 격리: model_id 필터로 교차 히트 방지<br />
+            의도별 TTL 차등: troubleshoot 7일 / connect 14일 / install 30일 /
+            clinical 90일<br />
+            guardrail_passed=true인 응답만 캐싱 (오류 전파 방지)
+          </div>
+          <div class="ch-result">
+            캐시 히트 시 &le;200ms 응답 (LLM 파이프라인 대비 15~25배 단축)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Workflow Detail -->
+    <div class="section">
+      <div class="section-title">Workflow — 11 Nodes</div>
+      <table class="clean">
+        <thead>
+          <tr>
+            <th style="width: 22%">노드</th>
+            <th style="width: 38%">역할</th>
+            <th style="width: 40%">기술</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>model_router</td>
+            <td>사용자 질문에서 기종 자동 식별</td>
+            <td>LLM 텍스트 분류 (270S/580/770S/970S)</td>
+          </tr>
+          <tr>
+            <td>cache_lookup</td>
+            <td>시멘틱 캐시 조회 (cosine &ge; 0.92)</td>
+            <td>ChromaDB 벡터 검색 + 기종별 격리</td>
+          </tr>
+          <tr>
+            <td>intent_router</td>
+            <td>질문 의도 분류 (5개 카테고리)</td>
+            <td>설치 / 연결 / 고장수리 / 임상 / 일반</td>
+          </tr>
+          <tr>
+            <td>전문 에이전트 &times;5</td>
+            <td>의도별 전문 에이전트 실행</td>
+            <td>RAG (PDF 벡터 검색) + Tool Calling (SQLite)</td>
+          </tr>
+          <tr>
+            <td>guardrail</td>
+            <td>4단계 안전 검증 파이프라인</td>
+            <td>결정론적 Check 1~3 + LLM Check 4</td>
+          </tr>
+          <tr>
+            <td>cache_store</td>
+            <td>검증 통과 응답만 캐싱</td>
+            <td>guardrail_passed=true 조건부 저장</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Development Methodology -->
+    <div class="section">
+      <div class="section-title">Development Methodology</div>
+      <div
+        style="font-size: 8pt; color: #444; line-height: 1.6; padding: 6px 0"
+      >
+        <strong>Claude AI</strong>를 개발 파트너로, 명세 관리 도구인
+        <strong>GitHub Spec-kit</strong>을 결합하여 요구사항 정의부터 아키텍처
+        설계, 테스트 기준 수립까지 명세를 먼저 작성하고 구현에 들어가는
+        <strong>명세 주도 개발</strong>을 실천했습니다. 7개 유저 스토리 · 32개
+        기능 요구사항 · 12개 성공 기준(SC)을 정의 → 444개 테스트로 전체 품질
+        지표 100% 검증. 테스트는 Unit 224 / Contract 11 / Evaluation 195로
+        구성되며, API 키 0개 · 실행 시간 2.11초로 완전 오프라인 실행이
+        가능합니다.
+      </div>
+    </div>
+
+    <!-- Experience -->
+    <div class="section">
+      <div class="section-title">Experience</div>
+
+      <div class="exp-item">
+        <div class="exp-left">
+          <h4>삼성 청년 SW 아카데미 (SSAFY) 10기</h4>
+          <div class="exp-sub">Java 전공 수료 · 1,600시간</div>
+          <ul class="exp-detail">
+            <li>알고리즘 · 자료구조 · 웹 개발 (Spring, Vue.js) 집중 교육</li>
+            <li>팀 프로젝트 기반 협업 경험 — 기획 → 설계 → 개발 → 발표</li>
+          </ul>
+        </div>
+        <div class="exp-right">2023.07 — 2024.06</div>
+      </div>
+
+      <div class="exp-item">
+        <div class="exp-left">
+          <h4>SW 예비학교 멘토링</h4>
+          <div class="exp-sub">교내 멘토-멘티 활동 · 2회 진행</div>
+          <ul class="exp-detail">
+            <li>
+              신입생 5명 대상 Python 중심 학습 가이드 제공 및 학과 적응 지원
+            </li>
+          </ul>
+        </div>
+        <div class="exp-right">2022.02 · 2023.02</div>
+      </div>
+
+      <div class="exp-item">
+        <div class="exp-left">
+          <h4>디랩 코딩학원 목동점 — 담임 강사</h4>
+          <div class="exp-sub">초·중·고 대상 코딩 교육</div>
+          <ul class="exp-detail">
+            <li>
+              Python · Scratch · App Inventor 활용 수업 (10명 이내 3개 반 지도)
+            </li>
+          </ul>
+        </div>
+        <div class="exp-right">2022.05 · 2023.02</div>
+      </div>
+    </div>
+  </body>
+</html>

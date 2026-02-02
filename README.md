@@ -12,7 +12,6 @@
   <img src="https://img.shields.io/badge/RAG-ChromaDB-FF6F00" alt="RAG" />
   <img src="https://img.shields.io/badge/FastAPI-0.115+-009688?logo=fastapi&logoColor=white" alt="FastAPI" />
   <img src="https://img.shields.io/badge/Streamlit-1.40+-FF4B4B?logo=streamlit&logoColor=white" alt="Streamlit" />
-  <img src="https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white" alt="Docker" />
   <img src="https://img.shields.io/badge/AWS-EC2%20Free%20Tier-FF9900?logo=amazonec2&logoColor=white" alt="AWS" />
   <img src="https://img.shields.io/badge/Tests-444%20passed-brightgreen" alt="Tests" />
   <img src="https://img.shields.io/badge/SC%20Metrics-9%2F9%20PASS-brightgreen" alt="SC Metrics" />
@@ -350,8 +349,7 @@ flowchart TD
 | **Structured DB** | SQLite (aiosqlite) | >=0.20 | 에러코드·주변기기 DB |
 | **Backend** | FastAPI | >=0.115 | REST API + SSE 스트리밍 |
 | **Frontend** | Streamlit | >=1.40 | 채팅 UI |
-| **Container** | Docker Compose (로컬) / systemd (EC2) | - | 로컬: Docker, EC2: venv + systemd |
-| **Cloud** | AWS EC2 (t3.micro, 프리 티어) | - | 평일 09-19시 자동 운영 |
+| **Cloud** | AWS EC2 (t3.micro, 프리 티어) | - | venv + systemd, 평일 09-19시 자동 운영 |
 | **IaC** | CloudFormation | - | EventBridge + Lambda 스케줄러 |
 | **Testing** | pytest | >=8.0 | 444 테스트, 커스텀 SC 메트릭 |
 | **Linting** | Ruff | >=0.8 | Python 린팅 (line-length=100) |
@@ -431,8 +429,6 @@ InBody-Multi-Model-Technical-Support-Agent/
 │   ├── inbody-api.service         # FastAPI systemd unit
 │   ├── inbody-ui.service          # Streamlit systemd unit
 │   └── scheduler-cfn.yml          # CloudFormation 스케줄러
-├── Dockerfile                     # 멀티스테이지 빌드
-├── docker-compose.yml             # api + ui 2-서비스
 └── pyproject.toml                 # 의존성 + dev/prod 분리
 ```
 
@@ -501,21 +497,11 @@ pytest tests/ --cov=src --cov-report=term-missing
 
 ## 배포
 
-### Docker Compose (로컬)
-
-```bash
-docker compose build
-docker compose up -d
-
-# API: http://localhost:8000
-# UI:  http://localhost:8501
-```
-
 ### AWS EC2
 
 ```bash
 # EC2 t3.micro (프리 티어) + venv + systemd
-# deploy/ec2-userdata.sh로 자동 프로비저닝 (Docker 미사용)
+# deploy/ec2-userdata.sh로 자동 프로비저닝 (venv + systemd)
 
 # 데이터 전송 (로컬 → EC2)
 scp -i my-keypair.pem .env ubuntu@<EC2_IP>:~/InBody-Multi-Model-Technical-Support-Agent/
@@ -540,7 +526,7 @@ aws cloudformation deploy \
 |------|------|
 | [기술 스택 상세](docs/techStack.md) | 기술 선택 근거 및 아키텍처 결정 기록 |
 | [테스트 리포트](docs/test-report.md) | 444 테스트 상세 결과 |
-| [배포 가이드](docs/deployment-guide.md) | Docker / EC2 / CloudFormation 배포 |
+| [배포 가이드](docs/deployment-guide.md) | EC2 / CloudFormation 배포 |
 | [기능 명세](specs/001-inbody-tech-master/spec.md) | 7 User Stories, 32 FR, 12 SC |
 | [구현 계획](specs/001-inbody-tech-master/plan.md) | 아키텍처 설계 및 구현 전략 |
 | [데이터 모델](specs/001-inbody-tech-master/data-model.md) | AgentState, DB 스키마, 벡터 스토어 설계 |
