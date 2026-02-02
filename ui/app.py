@@ -39,10 +39,12 @@ MODEL_CHOICES = [
 
 
 def _handle_model_selection(model_id: str) -> None:
-    """기종 선택 버튼 클릭 시 상태 업데이트 후 rerun."""
+    """기종 선택 버튼 클릭 시 대화를 이어가며 재질문."""
     original_q = st.session_state["messages"][-2]["content"]
-    st.session_state["messages"] = []
-    st.session_state["thread_id"] = generate_thread_id()
+    # 기종 선택 응답의 버튼 비활성화
+    last_msg = st.session_state["messages"][-1]
+    if last_msg.get("metadata"):
+        last_msg["metadata"]["needs_model_selection"] = False
     st.session_state["_model_from_chat"] = model_id
     st.session_state["pending_question"] = original_q
     st.rerun()
