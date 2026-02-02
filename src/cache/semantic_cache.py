@@ -7,6 +7,7 @@ Chroma 벡터 DB의 semantic_cache 컬렉션을 사용하며,
 
 import json
 import logging
+import re
 import time
 import uuid
 
@@ -19,6 +20,14 @@ from src.rag.vectorstore import get_chroma_client, get_embeddings
 logger = logging.getLogger(__name__)
 
 CACHE_COLLECTION_NAME = "semantic_cache"
+
+_ERROR_CODE_RE = re.compile(r"[Ee]\d{3}")
+
+
+def extract_error_code(text: str) -> str | None:
+    """텍스트에서 에러 코드(E001 등)를 추출한다."""
+    match = _ERROR_CODE_RE.search(text)
+    return match.group(0).upper() if match else None
 
 # 의도별 TTL 매핑 (초)
 _TTL_MAP: dict[str, int] = {
@@ -98,10 +107,22 @@ class SemanticCache:
 
         query_embedding = self._embed_query(query)
 
+        # 에러 코드가 포함된 쿼리는 동일 에러 코드 캐시만 조회
+        error_code = extract_error_code(query)
+        if error_code:
+            where = {
+                "$and": [
+                    {"identified_model": model_id},
+                    {"error_code": error_code},
+                ]
+            }
+        else:
+            where = {"identified_model": model_id}
+
         results = self._collection.query(
             query_embeddings=[query_embedding],
             n_results=1,
-            where={"identified_model": model_id},
+            where=where,
             include=["metadatas", "distances", "documents"],
         )
 
@@ -202,6 +223,7 @@ class SemanticCache:
             "guardrail_passed": True,
             "created_at": int(time.time()),
             "hit_count": 0,
+            "error_code": extract_error_code(query) or "",
         }
 
         self._collection.add(
